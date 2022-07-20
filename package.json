@@ -6,6 +6,7 @@
 	"main": "build/index.js",
 	"scripts": {
 		"start": "tsc && node build/index.js",
+		"dev": "tsc --watch",
 		"build": "tsc"
 	},
 	"dependencies": {
