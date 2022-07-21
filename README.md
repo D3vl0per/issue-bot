@@ -4,23 +4,16 @@
 
 ## Running the code
 
-Install the dependencies
+Install dependencies
 ```bash
 npm install
 ```
 
 Run the bot
 ```bash
-npm run start
-```
-
-OR
-
-```bash
-npm run build
-node build/index.js
+npm start
 ```
 
 ## Built Using
 
-- Discord.JS V13
+- Discord.TS (DJX)
