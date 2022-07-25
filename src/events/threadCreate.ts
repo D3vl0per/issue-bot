@@ -14,12 +14,19 @@ export class Example {
 
 		let embed: any;
 		let issue: any = {};
+		let projectId = 0;
 
-		gh.createProject(name);
+		gh.createProject().then((res) => {
+			projectId = res.data.id;
+
+			gh.createColumns(projectId);
+			gh.setProjectId(projectId);
+		});
+
 		gh.createIssue(name, name, ['backlog']).then((res) => {
 			issue.id = res.data.number;
 			issue.status = res.data.labels[0];
-			issue.issueLink = res.data.url;
+			issue.issueLink = res.data.html_url;
 
 			embed = new EmbedBuilder()
 				.setColor('#4F53F1')
