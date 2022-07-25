@@ -14,20 +14,15 @@ export class Example {
 		const newName = newThread.name;
 
 		if (newThread.archived) {
-			console.log('Archieved ', newThread.name);
-
 			gh.lockIssue(newName);
 			gh.closeIssue(newThread.name);
 		}
 
 		if (oldThread.archived && !newThread.archived) {
-			console.log('unarchived');
 			gh.unLockIssue(newName);
 			gh.reOpenIssue(newName);
 		}
 
 		gh.editIssue(oldName, newName);
-
-		console.log(`Old: ${oldName}, New: ${newName}`);
 	}
 }
