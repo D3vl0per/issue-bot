@@ -42,7 +42,7 @@ bot.once('ready', async () => {
 	//    ...bot.guilds.cache.map((g) => g.id)
 	//  );
 
-	console.log('Bot started');
+	console.log(`${bot.user?.username} is up.`);
 });
 
 bot.on('interactionCreate', (interaction: Interaction) => {
@@ -71,3 +71,5 @@ async function run() {
 }
 
 run();
+
+export default bot;
