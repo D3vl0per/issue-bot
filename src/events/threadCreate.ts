@@ -15,6 +15,7 @@ export class Example {
 		let embed: any;
 		let issue: any = {};
 
+		gh.createProject(name);
 		gh.createIssue(name, name, ['backlog']).then((res) => {
 			issue.id = res.data.number;
 			issue.status = res.data.labels[0];

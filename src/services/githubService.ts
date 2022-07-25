@@ -5,6 +5,7 @@ export class GitHubService {
 	private app: Octokit;
 	private repo: string;
 	private owner: string;
+	private labels: any;
 
 	constructor(repo: string, owner: string) {
 		this.repo = repo;
@@ -13,6 +14,28 @@ export class GitHubService {
 		this.app = new Octokit({
 			auth: process.env.GH_TOKEN,
 		});
+
+		this.labels = ['Backlog', 'Todo', 'In-Progress', 'Testing', 'Done'];
+	}
+
+	createProject(name: string) {
+		this.app.projects.createForRepo({
+			owner: this.owner,
+			repo: this.repo,
+			name: this.repo,
+		});
+	}
+
+	createCard(name: string, channel: string) {
+		// TODO.
+	}
+
+	updateCard(thread: string, name: string, body: string) {
+		// TODO.
+	}
+
+	moveCard(thread: string, label: string) {
+		// TODO.
 	}
 
 	lockIssue(channel: string) {
