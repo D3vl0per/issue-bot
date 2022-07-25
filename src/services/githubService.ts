@@ -15,6 +15,56 @@ export class GitHubService {
 		});
 	}
 
+	lockIssue(channel: string) {
+		let n = 0;
+
+		this.app.search
+			.issuesAndPullRequests({
+				q: `type:issue ${channel} repo:${this.owner}/${this.repo}`,
+			})
+			.then((query) => {
+				n = query.data.items[0].number;
+
+				this.app.issues.lock({
+					issue_number: Number(n),
+					owner: this.owner,
+					repo: this.repo,
+					title: channel,
+					labels: query.data.items[0].labels,
+				});
+			})
+			.catch((e: Error) => {
+				console.log('Bruh.', e);
+
+				return 'Issue not found.';
+			});
+	}
+
+	unLockIssue(channel: string) {
+		let n = 0;
+
+		this.app.search
+			.issuesAndPullRequests({
+				q: `type:issue ${channel} repo:${this.owner}/${this.repo}`,
+			})
+			.then((query) => {
+				n = query.data.items[0].number;
+
+				this.app.issues.unlock({
+					issue_number: Number(n),
+					owner: this.owner,
+					repo: this.repo,
+					title: channel,
+					labels: query.data.items[0].labels,
+				});
+			})
+			.catch((e: Error) => {
+				console.log('Bruh.', e);
+
+				return 'Issue not found.';
+			});
+	}
+
 	reOpenIssue(channel: string) {
 		let n = 0;
 
