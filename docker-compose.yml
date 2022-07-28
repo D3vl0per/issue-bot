@@ -21,8 +21,8 @@ services:
     # Init only
     # volumes:
     #   - ./deployment/db:/docker-entrypoint-initdb.d
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+    # volumes:
+    #   - ./data/postgres:/var/lib/postgresql/data
     restart: on-failure
     environment:
       POSTGRES_USER: sync
