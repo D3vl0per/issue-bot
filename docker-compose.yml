@@ -1,7 +1,57 @@
 version: '3'
 services:
   app:
+    container_name: discord_bot
+    hostname: discordbot
     build: .
     command: node build/main.js
     environment:
       - DC_BOT_TOKEN=${DC_BOT_TOKEN}
+    networks:
+      botnet:
+        ipv4_address: 10.10.13.2
+
+  postgres_db:
+    container_name: postgres_db
+    hostname: postgres
+    image: 'postgres:latest'
+    ports:
+      - 5432:5432
+      - 5433:5433
+    # Init only
+    # volumes:
+    #   - ./deployment/db:/docker-entrypoint-initdb.d
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: on-failure
+    environment:
+      POSTGRES_USER: sync
+      POSTGRES_PASSWORD: supersecretpassword
+      POSTGRES_DB: sync-db
+    networks:
+      botnet:
+        ipv4_address: 10.10.13.3
+
+  pg_admin:
+    container_name: pg_admin
+    hostname: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    depends_on:
+      - postgres_db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@sync.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - '5050:80'
+    networks:
+      botnet:
+        ipv4_address: 10.10.13.4
+
+networks:
+  botnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.13.0/24
+          gateway: 10.10.13.1
