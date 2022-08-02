@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { dirname, importx } from '@discordx/importer';
 import type { Interaction, Message } from 'discord.js';
+import { ActivityType } from 'discord.js';
 import { IntentsBitField } from 'discord.js';
 import { Client } from 'discordx';
 
@@ -42,7 +43,12 @@ bot.once('ready', async () => {
 	//    ...bot.guilds.cache.map((g) => g.id)
 	//  );
 
-	console.log('Bot started');
+	bot.user?.setPresence({
+		activities: [{ name: 'threads @ your guild.', type: ActivityType.Listening }],
+		status: 'dnd',
+	});
+
+	console.log(`${bot.user?.username} is up.`);
 });
 
 bot.on('interactionCreate', (interaction: Interaction) => {
