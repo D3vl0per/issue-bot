@@ -4,7 +4,6 @@ import { ActionRowBuilder, SelectMenuBuilder, ModalBuilder, TextInputBuilder, Te
 
 import { Discord, ModalComponent, Slash } from 'discordx';
 import { getDetails, setUpService } from '../services/github.js';
-import { bot } from '../main.js';
 
 @Discord()
 export class SetUp {

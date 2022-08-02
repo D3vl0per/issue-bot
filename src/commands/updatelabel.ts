@@ -2,7 +2,7 @@ import type { CommandInteraction, MessageActionRowComponentBuilder, SelectMenuIn
 import { ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
 import { Discord, SelectMenuComponent, Slash } from 'discordx';
 
-import { bot } from '../main.js';
+import { bot } from '../entry.bot.js';
 import { GitHubService } from '../services/githubService.js';
 
 const gh = new GitHubService('0xAndrewBlack', 'test-repo');

@@ -5,6 +5,7 @@ import type { Interaction, Message } from 'discord.js';
 import { ActivityType } from 'discord.js';
 import { IntentsBitField } from 'discord.js';
 import { Client } from 'discordx';
+import { env } from 'process';
 
 export const bot = new Client({
 	// To only use global commands (use @Guild for specific guild command), comment this line
@@ -20,7 +21,7 @@ export const bot = new Client({
 	],
 
 	// Debug logs are disabled in silent mode
-	silent: false,
+	silent: String(env.NODE_ENV) !== 'development' ? true : false,
 
 	// Configuration for @SimpleCommand
 	simpleCommand: {
@@ -44,7 +45,7 @@ bot.once('ready', async () => {
 	//  );
 
 	bot.user?.setPresence({
-		activities: [{ name: 'threads @ your guild.', type: ActivityType.Listening }],
+		activities: [{ name: 'over your guild.', type: ActivityType.Watching }],
 		status: 'dnd',
 	});
 
