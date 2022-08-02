@@ -1,59 +1,62 @@
-import { Embed, EmbedBuilder } from 'discord.js';
 import type { ArgsOf, Client } from 'discordx';
+import { Embed, EmbedBuilder } from 'discord.js';
 import { Discord, On } from 'discordx';
 
-import { GitHubService } from '../services/githubService.js';
-
-const gh = new GitHubService('test-repo', '0xAndrewBlack');
+import { createIssue, createSync, getDetails } from '../services/github.js';
+import { Octokit } from '@octokit/rest';
 
 @Discord()
-export class Example {
+export class ThreadCreate {
 	@On('threadCreate')
-	onMessage([thread]: ArgsOf<'threadCreate'>, client: Client): void {
-		const { id, name, guild, guildId, url, lastMessage } = thread;
+	async onMessage([thread]: ArgsOf<'threadCreate'>, client: Client): Promise<void> {
+		const { id, name, guild, guildId } = thread;
 
 		let embed: any;
 		let issue: any = {};
-		let projectId = 0;
 
-		gh.createProject().then((res) => {
-			projectId = res.data.id;
+		const validChannels = process.env.CHANNEL_NAMES?.split(',');
+		if (!validChannels?.includes(String(thread.parentId))) return;
 
-			gh.createColumns(projectId);
-			gh.setProjectId(projectId);
+		const github = new Octokit({
+			auth: process.env.GH_TOKEN,
 		});
 
-		gh.createIssue(name, name, ['backlog']).then((res) => {
-			issue.id = res.data.number;
-			issue.status = res.data.labels[0];
-			issue.issueLink = res.data.html_url;
+		const { data } = await createIssue(github, guildId, name, name, ['backlog']);
 
-			embed = new EmbedBuilder()
-				.setColor('#4F53F1')
-				.setTitle(name)
-				.setURL(issue.issueLink)
-				.setDescription('Issue created.')
-				.addFields(
-					{
-						name: `ID`,
-						value: `${issue.id}`,
-						inline: true,
-					},
-					{
-						name: `Status`,
-						value: `${issue.status.name}`,
-						inline: true,
-					},
-					{
-						name: `Project`,
-						value: 'N/A',
-						inline: true,
-					}
-				);
+		// console.log(data);
 
-			thread.send({ embeds: [embed] });
-		});
+		issue.id = data.number;
+		issue.status = data.labels[0];
+		issue.issueLink = data.html_url;
 
-		console.log('Thread created', name);
+		const details = await getDetails(guildId);
+		const { repo_name, repo_owner } = details[0];
+
+		await createSync(github, guildId, name, issue.id, 'backlog');
+
+		embed = new EmbedBuilder()
+			.setColor('#4F53F1')
+			.setTitle(name)
+			.setURL(issue.issueLink)
+			.setDescription('Issue created.')
+			.addFields(
+				{
+					name: `ID`,
+					value: `${issue.id}`,
+					inline: false,
+				},
+				{
+					name: `Status`,
+					value: `${issue.status.name}`,
+					inline: false,
+				}
+			)
+			.setTimestamp()
+			.setFooter({
+				text: 'Synced by ZGEN.',
+				iconURL: client.user?.displayAvatarURL(),
+			});
+
+		thread.send({ embeds: [embed] });
 	}
 }

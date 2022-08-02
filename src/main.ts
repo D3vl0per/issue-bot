@@ -77,5 +77,3 @@ async function run() {
 }
 
 run();
-
-// export default bot;

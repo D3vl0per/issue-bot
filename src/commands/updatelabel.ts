@@ -2,10 +2,10 @@ import type { CommandInteraction, MessageActionRowComponentBuilder, SelectMenuIn
 import { ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
 import { Discord, SelectMenuComponent, Slash } from 'discordx';
 
-import Client, { bot } from '../main.js';
+import { bot } from '../main.js';
 import { GitHubService } from '../services/githubService.js';
 
-const gh = new GitHubService('test-repo', '0xAndrewBlack');
+const gh = new GitHubService('0xAndrewBlack', 'test-repo');
 
 // Backlog, todo, in-progress, testing, done
 const labels = [
@@ -17,7 +17,30 @@ const labels = [
 ];
 
 @Discord()
-export class Example {
+export class UpdateLabel {
+	@Slash('updatelabel', { description: 'Edit issue label.' })
+	async myRoles(interaction: CommandInteraction): Promise<unknown> {
+		if (!interaction.channel?.isThread()) {
+			await interaction.reply('Channel is not thread channel.');
+			return;
+		}
+
+		await interaction.deferReply();
+
+		// create menu for roles
+		const menu = new SelectMenuBuilder().addOptions(labels).setCustomId('updatelabel');
+
+		// create a row for message actions
+		const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(menu);
+
+		// send it
+		interaction.editReply({
+			components: [buttonRow],
+			content: 'Select the label!',
+		});
+		return;
+	}
+
 	@SelectMenuComponent('updatelabel')
 	async handle(interaction: SelectMenuInteraction): Promise<unknown> {
 		if (!interaction.channel?.isThread()) {
@@ -41,29 +64,6 @@ export class Example {
 
 		gh.editLabel([`${labelValue}`], Number(chs.id));
 
-		return;
-	}
-
-	@Slash('updatelabel', { description: 'Edit issue label.' })
-	async myRoles(interaction: CommandInteraction): Promise<unknown> {
-		if (!interaction.channel?.isThread()) {
-			await interaction.reply('Channel is not thread channel.');
-			return;
-		}
-
-		await interaction.deferReply();
-
-		// create menu for roles
-		const menu = new SelectMenuBuilder().addOptions(labels).setCustomId('updatelabel');
-
-		// create a row for message actions
-		const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(menu);
-
-		// send it
-		interaction.editReply({
-			components: [buttonRow],
-			content: 'Select the label!',
-		});
 		return;
 	}
 }

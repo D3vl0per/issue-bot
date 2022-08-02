@@ -1,28 +1,36 @@
-import { log } from 'console';
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
-
-import { GitHubService } from '../services/githubService.js';
-
-const gh = new GitHubService('test-repo', '0xAndrewBlack');
+import { Octokit } from '@octokit/rest';
+import { closeIssue, editIssue, lockIssue, reOpenIssue, unLockIssue } from '../services/github.js';
 
 @Discord()
-export class Example {
+export class ThreadUpdate {
 	@On('threadUpdate')
 	onMessage([oldThread, newThread]: ArgsOf<'threadUpdate'>, client: Client): void {
 		const oldName = oldThread.name;
 		const newName = newThread.name;
 
+		const github = new Octokit({
+			auth: process.env.GH_TOKEN,
+		});
+
 		if (newThread.archived) {
-			gh.lockIssue(newName);
-			gh.closeIssue(newThread.name);
+			lockIssue(github, newThread.guildId, newName);
+			// gh.lockIssue(newName);
+			closeIssue(github, newThread.guildId, newName);
+			// gh.closeIssue(newThread.name);
 		}
 
 		if (oldThread.archived && !newThread.archived) {
-			gh.unLockIssue(newName);
-			gh.reOpenIssue(newName);
+			console.log('unarchive.');
+
+			unLockIssue(github, newThread.guildId, newName);
+			// gh.unLockIssue(newName);
+			reOpenIssue(github, newThread.guildId, newName);
+			// gh.reOpenIssue(newName);
 		}
 
-		gh.editIssue(oldName, newName);
+		editIssue(github, newThread.guildId, oldName, newName);
+		// gh.editIssue(oldName, newName);
 	}
 }

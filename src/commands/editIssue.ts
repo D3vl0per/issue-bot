@@ -5,11 +5,11 @@ import { Discord, ModalComponent, Slash } from 'discordx';
 
 import { GitHubService } from '../services/githubService.js';
 
-const gh = new GitHubService('test-repo', '0xAndrewBlack');
+const gh = new GitHubService('0xAndrewBlack', 'test-repo');
 
 @Discord()
-export class Example {
-	@Slash('updateissue')
+export class EditIssue {
+	@Slash('editissue')
 	async attachment(interaction: CommandInteraction): Promise<void> {
 		if (!interaction.channel?.isThread()) {
 			await interaction.reply('Channel is not thread channel.');
@@ -17,7 +17,7 @@ export class Example {
 		}
 
 		// Create the modal
-		const modal = new ModalBuilder().setTitle('Edit Issue').setCustomId('Update Issue');
+		const modal = new ModalBuilder().setTitle('Edit Issue').setCustomId('Edit Issue');
 
 		// Create text input fields
 		const issueId = new TextInputBuilder().setCustomId('issueId').setLabel('Issue Id').setStyle(TextInputStyle.Short);
@@ -47,7 +47,7 @@ export class Example {
 		interaction.showModal(modal);
 	}
 
-	@ModalComponent('Update Issue')
+	@ModalComponent('Edit Issue')
 	async handle(interaction: ModalSubmitInteraction): Promise<void> {
 		if (!interaction.channel?.isThread()) {
 			await interaction.reply('Channel is not thread channel.');
