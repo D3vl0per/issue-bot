@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "module": "ESNext", // required
-    "target": "ESNext", // required
+    "declaration": false,
+    "esModuleInterop": true, // required
+    "module": "ESNext",
+    "target": "ESNext",
+    "strict": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "strict": true,
-    "outDir": "dist",
-    "emitDecoratorMetadata": true, // required
-    "experimentalDecorators": true, // required
-    "declaration": false,
-    "importHelpers": true, // required
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node", // required
-    "esModuleInterop": true, // required
+    "moduleResolution": "Node",
+    "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
       "@services/*": ["src/services"],

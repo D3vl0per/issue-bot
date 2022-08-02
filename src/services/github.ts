@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 import { inspect } from 'util';
 
-import { bot } from '../main.js';
+import { bot } from '../entry.bot.js';
 import { Card, CardContent, Project } from '../interfaces/github.js';
 
 import { PrismaClient, sync } from '@prisma/client';
