@@ -4,6 +4,8 @@ import { Shard, ShardingManager } from 'discord.js';
 export class ShardedBot {
 	static start(): void {
 		const manager: ShardingManager = new ShardingManager('./dist/entry.bot.js', {
+			totalShards: 1,
+			mode: 'process',
 			token: env.DC_BOT_TOKEN,
 		});
 
