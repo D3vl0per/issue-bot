@@ -2,10 +2,12 @@ import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import { ActionRowBuilder, SelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { Discord, ModalComponent, Slash } from 'discordx';
+import { getGuildInfo } from '../utils/dbFunctions.js';
 
 import { GitHubService } from '../services/githubService.js';
+import { stripStatusFromThread } from '../utils/utils.js';
 
-const gh = new GitHubService('0xAndrewBlack', 'test-repo');
+const gh = new GitHubService();
 
 @Discord()
 export class EditIssue {
@@ -20,8 +22,6 @@ export class EditIssue {
 		const modal = new ModalBuilder().setTitle('Edit Issue').setCustomId('Edit Issue');
 
 		// Create text input fields
-		const issueId = new TextInputBuilder().setCustomId('issueId').setLabel('Issue Id').setStyle(TextInputStyle.Short);
-
 		const issueTitle = new TextInputBuilder()
 			.setCustomId('issueTitle')
 			.setLabel('Issue Title')
@@ -32,16 +32,12 @@ export class EditIssue {
 			.setLabel('Issue Body')
 			.setStyle(TextInputStyle.Paragraph);
 
-		const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(issueId);
-
 		const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(issueTitle);
 
 		const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(issueBody);
 
 		// Add action rows to form
-		modal.addComponents(row1, row2, row3);
-
-		// --- snip ---
+		modal.addComponents(row2, row3);
 
 		// Present the modal to the user
 		interaction.showModal(modal);
@@ -54,17 +50,19 @@ export class EditIssue {
 			return;
 		}
 
-		const [issueId, issueTitle, issueBody] = ['issueId', 'issueTitle', 'issueBody'].map((id) =>
-			interaction.fields.getTextInputValue(id)
-		);
+		const [issueTitle, issueBody] = ['issueTitle', 'issueBody'].map((id) => interaction.fields.getTextInputValue(id));
+		const status = interaction.channel.name.split(' ')[0];
 
-		await interaction.reply(`issue id: ${issueId}, issue title: ${issueTitle}, issue body: ${issueBody}`);
-
-		interaction.channel.edit({
-			name: `${issueTitle}`,
+		interaction.reply(`issue title: ${issueTitle}, issue body: ${issueBody}`).then((d) => {
+			// @ts-ignore
+			interaction.channel.setName(`${status} - ${issueTitle}`);
 		});
 
-		gh.editIssueIdWithBody(Number(issueId), issueTitle, issueBody);
+		const guildId: any = interaction.guildId;
+		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
+
+		await gh.populate(guildId, repo_owner, repo_name, project_id);
+		await gh.editIssue(stripStatusFromThread(interaction.channel.name), issueTitle, issueBody);
 
 		return;
 	}

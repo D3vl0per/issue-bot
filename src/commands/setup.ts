@@ -1,14 +1,21 @@
-import { Octokit } from '@octokit/rest';
 import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import { ActionRowBuilder, SelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { Discord, ModalComponent, Slash } from 'discordx';
-import { getDetails, setUpService } from '../services/github.js';
+import { insertGuildInfo, isGuildExists } from '../utils/dbFunctions.js';
+
+import { gh } from '../services/githubService.js';
 
 @Discord()
 export class SetUp {
 	@Slash('setup')
 	async attachment(interaction: CommandInteraction): Promise<void> {
+		if (await isGuildExists(String(interaction.guildId))) {
+			interaction.reply('Already configured.');
+
+			return;
+		}
+
 		// Create the modal
 		const modal = new ModalBuilder().setTitle('Setup BOT').setCustomId('BOT Setup');
 
@@ -23,14 +30,19 @@ export class SetUp {
 			.setLabel('Repo Owner (Username only)')
 			.setStyle(TextInputStyle.Short);
 
+		const projectName = new TextInputBuilder()
+			.setCustomId('projectName')
+			.setLabel('Project Name (Top level GitHub Project)')
+			.setStyle(TextInputStyle.Short);
+
 		const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(repoOwner);
 
 		const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(repoName);
 
-		// Add action rows to form
-		modal.addComponents(row1, row2);
+		const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(projectName);
 
-		// --- snip ---
+		// Add action rows to form
+		modal.addComponents(row1, row2, row3);
 
 		// Present the modal to the user
 		interaction.showModal(modal);
@@ -38,19 +50,19 @@ export class SetUp {
 
 	@ModalComponent('BOT Setup')
 	async handle(interaction: ModalSubmitInteraction): Promise<void> {
-		const [repoName, repoOwner] = ['repoName', 'repoOwner'].map((id) => interaction.fields.getTextInputValue(id));
+		const [repoName, repoOwner, projectName] = ['repoName', 'repoOwner', 'projectName'].map((id) =>
+			interaction.fields.getTextInputValue(id)
+		);
 
-		const { channelId, guildId } = interaction;
+		const { guildId } = interaction;
 
-		// const details = await getDetails(String(guildId));
+		await insertGuildInfo(String(guildId), String(interaction.channelId), repoOwner, repoName, projectName);
+		await gh.populate(String(guildId), repoOwner, repoName, projectName);
 
-		// if (details[0].repo_name) {
-		// 	await interaction.reply(`Config exits. repo name: ${repoName}, repo owner: ${repoOwner}`);
-
-		// 	return;
-		// }
-
-		setUpService(String(guildId), String(channelId), repoOwner, repoName);
+		await interaction.deferReply({ ephemeral: true });
+		await interaction.reply(
+			`Successful setup with ${projectName} project, ${repoName} repository and ${repoOwner} owner.`
+		);
 
 		return;
 	}

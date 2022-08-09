@@ -1,44 +1,18 @@
--- Table: public.sync
+-- Table: public.guilds
 
--- DROP TABLE IF EXISTS public.sync;
+-- DROP TABLE IF EXISTS public.guilds;
 
--- CREATE
-
-CREATE TABLE IF NOT EXISTS public.sync
+CREATE TABLE IF NOT EXISTS public.guilds
 (
-    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
-    guild_id character varying(255) COLLATE pg_catalog."default",
+    guild_id character varying(255) COLLATE pg_catalog."default" NOT NULL,
     channel_id character varying(255) COLLATE pg_catalog."default",
     project_id character varying(255) COLLATE pg_catalog."default",
     repo_owner character varying(255) COLLATE pg_catalog."default",
     repo_name character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT sync_pkey PRIMARY KEY (id)
+    CONSTRAINT guilds_pkey PRIMARY KEY (guild_id)
 )
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.sync
+ALTER TABLE IF EXISTS public.guilds
     OWNER to sync;
-
--- DELETE
-
-DELETE FROM public.sync
-	WHERE <condition>;
-
--- INSERT
-
-INSERT INTO public.sync(
-	id, guild_id, channel_id, project_id, repo_owner, repo_name)
-	VALUES (?, ?, ?, ?, ?, ?);
-
-
--- SELECT
-
-SELECT id, guild_id, channel_id, project_id, repo_owner, repo_name
-	FROM public.sync;
-
--- UPDATE
-
-UPDATE public.sync
-	SET id=?, guild_id=?, channel_id=?, project_id=?, repo_owner=?, repo_name=?
-	WHERE <condition>;

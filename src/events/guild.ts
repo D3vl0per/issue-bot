@@ -1,15 +1,14 @@
 import type { ArgsOf, Client } from 'discordx';
-import { EmbedBuilder } from 'discord.js';
 import { Discord, On } from 'discordx';
+import { EmbedBuilder } from 'discord.js';
 
 @Discord()
-export class GuildCreate {
+export class GuildHandler {
 	@On('guildCreate')
-	onMessage([guild]: ArgsOf<'guildCreate'>, client: Client): void {
+	onGuildCreate([guild]: ArgsOf<'guildCreate'>, client: Client): void {
 		console.log(`Guild joined ${guild.name}`);
 
 		const defaultChannel = guild.systemChannel;
-
 		const setUpEmbed = new EmbedBuilder()
 			.setTitle('Yo!')
 			.setURL('https://github.com/0xAndrewBlack/github-discord-sync')
@@ -23,7 +22,7 @@ export class GuildCreate {
 					value: `Use the \`/setup\` slash command to set me up with the corresponding repo and channel.\n\n`,
 				},
 				{
-					name: `:plus: Create Issue`,
+					name: `*️⃣ Create Issue`,
 					value: `An issue will be created when a new thread is made under the corresponding channel.\n\n`,
 				},
 				{
@@ -45,7 +44,7 @@ export class GuildCreate {
 			])
 			.setThumbnail(String(client.user?.displayAvatarURL()))
 			.setFooter({
-				text: 'Sync BOT',
+				text: 'Sync by ZGEN.',
 				iconURL: client.user?.displayAvatarURL(),
 			})
 			.setTimestamp();

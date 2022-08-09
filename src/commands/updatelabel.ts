@@ -1,20 +1,10 @@
 import type { CommandInteraction, MessageActionRowComponentBuilder, SelectMenuInteraction } from 'discord.js';
 import { ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
-import { Discord, SelectMenuComponent, Slash } from 'discordx';
+import { Discord, Guard, SelectMenuComponent, Slash } from 'discordx';
+import { getGuildInfo } from '../utils/dbFunctions.js';
 
-import { bot } from '../entry.bot.js';
-import { GitHubService } from '../services/githubService.js';
-
-const gh = new GitHubService('0xAndrewBlack', 'test-repo');
-
-// Backlog, todo, in-progress, testing, done
-const labels = [
-	{ label: 'Backlog', value: 'backlog' },
-	{ label: 'Todo', value: 'todo' },
-	{ label: 'In-Progress', value: 'wip' },
-	{ label: 'Testing', value: 'testing' },
-	{ label: 'Done', value: 'done' },
-];
+import { gh } from '../services/githubService.js';
+import { labels, labelsWithEmojis, stripStatusFromThread } from '../utils/utils.js';
 
 @Discord()
 export class UpdateLabel {
@@ -25,7 +15,7 @@ export class UpdateLabel {
 			return;
 		}
 
-		await interaction.deferReply();
+		await interaction.deferReply({ ephemeral: true });
 
 		// create menu for roles
 		const menu = new SelectMenuBuilder().addOptions(labels).setCustomId('updatelabel');
@@ -48,7 +38,7 @@ export class UpdateLabel {
 			return;
 		}
 
-		await interaction.deferReply();
+		await interaction.deferReply({ ephemeral: true });
 
 		// extract selected value by member
 		const labelValue = interaction.values?.[0];
@@ -60,9 +50,17 @@ export class UpdateLabel {
 
 		await interaction.followUp(`you have selected label: ${labels.find((label) => label.value === labelValue)?.label}`);
 
-		const chs: any = bot.channels.cache.find((c) => c.id === interaction.channelId);
+		const lebol: any = labels.find((lbl) => lbl.value === labelValue)?.label;
 
-		gh.editLabel([`${labelValue}`], Number(chs.id));
+		const guildId: any = interaction.guildId;
+		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
+
+		await gh.populate(guildId, repo_owner, repo_name, project_id);
+		await gh.editIssueLabel(stripStatusFromThread(interaction.channel.name), [lebol]);
+
+		const status = labelsWithEmojis.find((labels) => labels.value === labelValue)?.emoji;
+
+		await interaction.channel.setName(`${status} - ${stripStatusFromThread(interaction.channel.name)}`);
 
 		return;
 	}

@@ -7,9 +7,8 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model sync {
-  id         BigInt  @id @default(autoincrement())
-  guild_id   String? @db.VarChar(255)
+model guilds {
+  guild_id   String  @id @db.VarChar(255)
   channel_id String? @db.VarChar(255)
   project_id String? @db.VarChar(255)
   repo_owner String? @db.VarChar(255)
