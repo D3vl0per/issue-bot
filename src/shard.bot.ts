@@ -1,11 +1,12 @@
 import { env } from 'process';
+
 import { Shard, ShardingManager } from 'discord.js';
 
 export class ShardedBot {
 	static start(): void {
 		const manager: ShardingManager = new ShardingManager('./dist/entry.bot.js', {
-			totalShards: 1,
-			mode: 'process',
+			totalShards: 2,
+			mode: 'worker',
 			token: env.DC_BOT_TOKEN,
 		});
 

@@ -1,11 +1,12 @@
 import 'reflect-metadata';
 
-import { dirname, importx } from '@discordx/importer';
-import type { Interaction, Message } from 'discord.js';
-import { ActivityType } from 'discord.js';
-import { IntentsBitField } from 'discord.js';
-import { Client } from 'discordx';
 import { env } from 'process';
+
+import type { Interaction, Message } from 'discord.js';
+import { dirname, importx } from '@discordx/importer';
+import { IntentsBitField } from 'discord.js';
+import { ActivityType } from 'discord.js';
+import { Client } from 'discordx';
 
 export const bot = new Client({
 	// To only use global commands (use @Guild for specific guild command), comment this line
