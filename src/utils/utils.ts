@@ -3,7 +3,7 @@ export function stripStatusFromThread(threadName: string): string {
 		.split(' ')
 		.reverse()
 		.join(' ')
-		.substring(0, threadName.length - 4)
+		.substring(0, threadName.length - 5)
 		.split(' ')
 		.reverse()
 		.join(' ');
@@ -24,3 +24,5 @@ export const labelsWithEmojis = [
 	{ label: 'Testing', value: 'testing', emoji: '🧪' },
 	{ label: 'Done', value: 'done', emoji: '✅' },
 ];
+
+export const Priorities = [1, 2, 3];
