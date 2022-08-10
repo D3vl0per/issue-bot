@@ -26,6 +26,9 @@ export class GitHubService {
 			org: String(env.GH_ORG),
 			number: Number(env.GH_PROJECT_NUMBER),
 			token: String(env.GH_TOKEN),
+			fields: {
+				priority: 'Priority',
+			},
 		});
 		this.labels = ['Backlog', 'Todo', 'In-Progress', 'Testing', 'Done'];
 	}
@@ -109,8 +112,9 @@ export class GitHubService {
 			})
 			.then((query) => {
 				const { number, labels, node_id } = query.data.items[0];
+				console.log(labels);
 
-				this.editProject(node_id, String(labels));
+				this.editProject(node_id, String(labels[0].name));
 
 				github.issues.update({
 					issue_number: Number(number),
@@ -242,7 +246,39 @@ export class GitHubService {
 		}
 	}
 
-	async getProject() {}
+	async setPriority(channel: string, prio: Number): Promise<object> {
+		const { github, project, repo, owner } = this;
+
+		const issue = await github.search.issuesAndPullRequests({
+			q: `type:issue ${channel} repo:${owner}/${repo}`,
+			sort: 'created',
+		});
+
+		const { node_id } = issue.data.items[0];
+
+		// @ts-ignore
+		return await project.items.updateByContentId(node_id, { priority: prio });
+	}
+
+	async addAssignee(channel: string, assignee: string): Promise<object> {
+		const { github, repo, owner } = this;
+
+		const issue = await github.search.issuesAndPullRequests({
+			q: `type:issue ${channel} repo:${owner}/${repo}`,
+			sort: 'created',
+		});
+
+		const { number } = issue.data.items[0];
+
+		const assigned = await github.issues.addAssignees({
+			owner: this.owner,
+			repo: this.repo,
+			issue_number: number,
+			assignees: [assignee],
+		});
+
+		return assigned;
+	}
 
 	async createCard(issueContentId: string, title: string) {
 		const { github, project } = this;
