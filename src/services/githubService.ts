@@ -1,4 +1,5 @@
 import { env } from 'process';
+import { capitalize, sleep } from '../utils/utils.js';
 
 import { Octokit } from '@octokit/rest';
 import GitHubProject from 'github-project';
@@ -73,7 +74,7 @@ export class GitHubService {
 	async editIssueWoBody(oldTitle: string, newTitle: string) {
 		const { github, repo, owner, location } = this;
 
-		let issueNumber = 0;
+		await sleep(3000);
 
 		github.search
 			.issuesAndPullRequests({
@@ -101,9 +102,9 @@ export class GitHubService {
 	async editIssue(oldTitle: string, newTitle: string, issueBody: string) {
 		const { github, repo, owner, location } = this;
 
-		console.log(oldTitle);
-		console.log(newTitle);
-		console.log(issueBody);
+		// console.log(oldTitle);
+		// console.log(newTitle);
+		// console.log(issueBody);
 
 		github.search
 			.issuesAndPullRequests({
@@ -112,9 +113,8 @@ export class GitHubService {
 			})
 			.then((query) => {
 				const { number, labels, node_id } = query.data.items[0];
-				console.log(labels);
 
-				this.editProject(node_id, String(labels[0].name));
+				this.editProject(node_id, capitalize(String(labels[0].name)));
 
 				github.issues.update({
 					issue_number: Number(number),
@@ -135,10 +135,8 @@ export class GitHubService {
 	async editProject(nodeId: string, status: string) {
 		const { project } = this;
 
-		return project.items.getByContentId(nodeId).then((d) => {
-			project.items.updateByContentId(nodeId, {
-				status: status,
-			});
+		return project.items.updateByContentId(nodeId, {
+			status: status,
 		});
 	}
 

@@ -1,61 +1,37 @@
 import type { CommandInteraction, MessageActionRowComponentBuilder, SelectMenuInteraction } from 'discord.js';
 import { ActionRowBuilder, SelectMenuBuilder } from 'discord.js';
-import { Discord, SelectMenuComponent, Slash } from 'discordx';
+import { Discord, SelectMenuComponent, Slash, SlashChoice, SlashOption } from 'discordx';
 import { getGuildInfo } from '../utils/dbFunctions.js';
 
 import { gh } from '../services/githubService.js';
-import { labels, labelsWithEmojis, stripStatusFromThread } from '../utils/utils.js';
+import { Labels, labels, labelsWithEmojis, stripStatusFromThread } from '../utils/utils.js';
 import { Description } from '@discordx/utilities';
 
 @Discord()
 export class UpdateLabel {
 	@Slash('updatelabel')
-	@Description('Edits issue label.')
-	async myRoles(interaction: CommandInteraction): Promise<unknown> {
-		if (!interaction.channel?.isThread()) {
-			await interaction.reply('Channel is not thread channel.');
-
-			return;
-		}
-
-		await interaction.deferReply({ ephemeral: true });
-
-		const menu = new SelectMenuBuilder().addOptions(labels).setCustomId('updatelabel');
-		const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(menu);
-
-		interaction.editReply({
-			components: [buttonRow],
-			content: 'Select the label!',
-		});
-
-		return;
-	}
-
-	@SelectMenuComponent('updatelabel')
-	async handle(interaction: SelectMenuInteraction): Promise<unknown> {
-		if (!interaction.channel?.isThread()) {
-			await interaction.reply('Channel is not thread channel.');
-
-			return;
-		}
+	@Description('Sets label.')
+	async changePriority(
+		@SlashChoice(...Labels)
+		@SlashOption('label', { description: 'Issue label', required: true })
+		label: string,
+		interaction: CommandInteraction
+	): Promise<void> {
+		const labelCleaned = label.replace('-', ' ');
 
 		await interaction.deferReply({ ephemeral: true });
-
-		const labelValue = interaction.values?.[0];
-
-		if (!labelValue) return interaction.followUp('invalid label id, select again');
-
-		await interaction.followUp(`You selected label: ${labels.find((label) => label.value === labelValue)?.label}`);
+		await interaction.followUp(`You selected label: ${labelCleaned}`);
 
 		const guildId: any = interaction.guildId;
-		const lbl: any = labels.find((lbl) => lbl.value === labelValue)?.label;
 		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
 
 		await gh.populate(guildId, repo_owner, repo_name, project_id);
-		await gh.editIssueLabel(stripStatusFromThread(interaction.channel.name), [lbl]);
+		// @ts-ignore
+		await gh.editIssueLabel(stripStatusFromThread(interaction.channel.name), [labelCleaned]);
 
-		const status = labelsWithEmojis.find((labels) => labels.value === labelValue)?.emoji;
+		const status = labelsWithEmojis.find((labels) => labels.label === labelCleaned)?.emoji;
 
+		// @ts-ignore
 		await interaction.channel.setName(`${status} - ${stripStatusFromThread(interaction.channel.name)}`);
 
 		return;

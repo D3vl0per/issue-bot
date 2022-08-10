@@ -63,7 +63,8 @@ export class EditIssue {
 		await gh.editIssue(stripStatusFromThread(interaction.channel.name), issueTitle, issueBody);
 
 		await interaction.channel.setName(`${status} - ${issueTitle}`);
-		await interaction.reply({
+
+		interaction.reply({
 			content: `issue title: ${issueTitle}, issue body: ${issueBody}`,
 			ephemeral: true,
 		});
