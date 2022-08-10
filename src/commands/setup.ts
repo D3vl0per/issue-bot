@@ -1,14 +1,16 @@
 import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
-import { ActionRowBuilder, SelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { Discord, ModalComponent, Slash } from 'discordx';
 import { insertGuildInfo, isGuildExists } from '../utils/dbFunctions.js';
 
 import { gh } from '../services/githubService.js';
+import { Description } from '@discordx/utilities';
 
 @Discord()
 export class SetUp {
 	@Slash('setup')
+	@Description('First time GitHub setup.')
 	async attachment(interaction: CommandInteraction): Promise<void> {
 		if (await isGuildExists(String(interaction.guildId))) {
 			interaction.reply('Already configured.');
@@ -30,16 +32,16 @@ export class SetUp {
 			.setLabel('Repo Owner (Username only)')
 			.setStyle(TextInputStyle.Short);
 
-		const projectName = new TextInputBuilder()
-			.setCustomId('projectName')
-			.setLabel('Project Name (Top level GitHub Project)')
+		const projectID = new TextInputBuilder()
+			.setCustomId('projectID')
+			.setLabel('Project ID (Top level GitHub Project)')
 			.setStyle(TextInputStyle.Short);
 
 		const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(repoOwner);
 
 		const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(repoName);
 
-		const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(projectName);
+		const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(projectID);
 
 		// Add action rows to form
 		modal.addComponents(row1, row2, row3);
@@ -50,18 +52,18 @@ export class SetUp {
 
 	@ModalComponent('BOT Setup')
 	async handle(interaction: ModalSubmitInteraction): Promise<void> {
-		const [repoName, repoOwner, projectName] = ['repoName', 'repoOwner', 'projectName'].map((id) =>
+		const [repoName, repoOwner, projectID] = ['repoName', 'repoOwner', 'projectID'].map((id) =>
 			interaction.fields.getTextInputValue(id)
 		);
 
 		const { guildId } = interaction;
 
-		await insertGuildInfo(String(guildId), String(interaction.channelId), repoOwner, repoName, projectName);
-		await gh.populate(String(guildId), repoOwner, repoName, projectName);
+		await insertGuildInfo(String(guildId), String(interaction.channelId), repoOwner, repoName, projectID);
+		await gh.populate(String(guildId), repoOwner, repoName, projectID);
 
 		await interaction.deferReply({ ephemeral: true });
 		await interaction.reply(
-			`Successful setup with ${projectName} project, ${repoName} repository and ${repoOwner} owner.`
+			`Successful setup with ${projectID} project, ${repoName} repository and ${repoOwner} owner.`
 		);
 
 		return;

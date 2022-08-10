@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@discordx/importer": "^1.1.10",
 		"@discordx/pagination": "^3.0.0",
+		"@discordx/utilities": "^5.0.0",
 		"@octokit/auth-app": "^4.0.4",
 		"@octokit/rest": "^19.0.3",
 		"@octokit/webhooks": "^10.0.9",
