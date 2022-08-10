@@ -12,6 +12,12 @@ export class SetUp {
 	@Slash('setup')
 	@Description('First time GitHub setup.')
 	async attachment(interaction: CommandInteraction): Promise<void> {
+		if (interaction.channel?.isThread()) {
+			await interaction.reply('Channel is a thread channel, use the command under a normal text channel.');
+
+			return;
+		}
+
 		if (await isGuildExists(String(interaction.guildId))) {
 			interaction.reply('Already configured.');
 

@@ -17,6 +17,7 @@ export class EditIssue {
 	async attachment(interaction: CommandInteraction): Promise<void> {
 		if (!interaction.channel?.isThread()) {
 			await interaction.reply('Channel is not thread channel.');
+
 			return;
 		}
 
@@ -49,6 +50,7 @@ export class EditIssue {
 	async handle(interaction: ModalSubmitInteraction): Promise<void> {
 		if (!interaction.channel?.isThread()) {
 			await interaction.reply('Channel is not thread channel.');
+
 			return;
 		}
 

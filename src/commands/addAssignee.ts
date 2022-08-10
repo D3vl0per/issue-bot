@@ -18,6 +18,12 @@ export class AddAssignee {
 		assignee: string,
 		interaction: CommandInteraction
 	): Promise<void> {
+		if (!interaction.channel?.isThread()) {
+			await interaction.reply('Channel is not thread channel.');
+
+			return;
+		}
+
 		try {
 			const { guildId }: any = interaction;
 

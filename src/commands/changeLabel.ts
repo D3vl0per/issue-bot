@@ -35,6 +35,7 @@ export class UpdateLabel {
 	async handle(interaction: SelectMenuInteraction): Promise<unknown> {
 		if (!interaction.channel?.isThread()) {
 			await interaction.reply('Channel is not thread channel.');
+
 			return;
 		}
 

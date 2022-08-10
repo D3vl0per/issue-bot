@@ -19,6 +19,11 @@ export class ChangePriority {
 		prio: number,
 		interaction: CommandInteraction
 	): Promise<void> {
+		if (!interaction.channel?.isThread()) {
+			await interaction.reply('Channel is not thread channel.');
+			return;
+		}
+
 		try {
 			const guildId: any = interaction.guildId;
 			const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
