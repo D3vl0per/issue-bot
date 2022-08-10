@@ -23,6 +23,8 @@ services:
     #   - ./deployment/db:/docker-entrypoint-initdb.d
     # volumes:
     #   - ./data/postgres:/var/lib/postgresql/data
+    volumes:
+      - ./src/scripts/:/docker-entrypoint-initdb.d
     restart: on-failure
     environment:
       POSTGRES_USER: sync
