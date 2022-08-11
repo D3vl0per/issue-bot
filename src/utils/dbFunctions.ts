@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function isGuildExists(guildId: string): Promise<Boolean> {
-	const retObj = prisma.guilds.count({
+	const retObj = await prisma.guilds.count({
 		where: {
 			guild_id: guildId,
 		},

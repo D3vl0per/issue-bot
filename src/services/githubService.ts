@@ -1,4 +1,5 @@
 import { env } from 'process';
+import { capitalize, sleep } from '../utils/utils.js';
 
 import { Octokit } from '@octokit/rest';
 import GitHubProject from 'github-project';
@@ -26,6 +27,9 @@ export class GitHubService {
 			org: String(env.GH_ORG),
 			number: Number(env.GH_PROJECT_NUMBER),
 			token: String(env.GH_TOKEN),
+			fields: {
+				priority: 'Priority',
+			},
 		});
 		this.labels = ['Backlog', 'Todo', 'In-Progress', 'Testing', 'Done'];
 	}
@@ -70,7 +74,7 @@ export class GitHubService {
 	async editIssueWoBody(oldTitle: string, newTitle: string) {
 		const { github, repo, owner, location } = this;
 
-		let issueNumber = 0;
+		await sleep(3000);
 
 		github.search
 			.issuesAndPullRequests({
@@ -89,7 +93,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -98,9 +102,9 @@ export class GitHubService {
 	async editIssue(oldTitle: string, newTitle: string, issueBody: string) {
 		const { github, repo, owner, location } = this;
 
-		console.log(oldTitle);
-		console.log(newTitle);
-		console.log(issueBody);
+		// console.log(oldTitle);
+		// console.log(newTitle);
+		// console.log(issueBody);
 
 		github.search
 			.issuesAndPullRequests({
@@ -110,7 +114,7 @@ export class GitHubService {
 			.then((query) => {
 				const { number, labels, node_id } = query.data.items[0];
 
-				this.editProject(node_id, String(labels));
+				this.editProject(node_id, capitalize(String(labels[0].name)));
 
 				github.issues.update({
 					issue_number: Number(number),
@@ -122,7 +126,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -131,10 +135,8 @@ export class GitHubService {
 	async editProject(nodeId: string, status: string) {
 		const { project } = this;
 
-		return project.items.getByContentId(nodeId).then((d) => {
-			project.items.updateByContentId(nodeId, {
-				status: status,
-			});
+		return project.items.updateByContentId(nodeId, {
+			status: status,
 		});
 	}
 
@@ -160,7 +162,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -198,7 +200,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -225,7 +227,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -242,7 +244,39 @@ export class GitHubService {
 		}
 	}
 
-	async getProject() {}
+	async setPriority(channel: string, prio: Number): Promise<object> {
+		const { github, project, repo, owner } = this;
+
+		const issue = await github.search.issuesAndPullRequests({
+			q: `type:issue ${channel} repo:${owner}/${repo}`,
+			sort: 'created',
+		});
+
+		const { node_id } = issue.data.items[0];
+
+		// @ts-ignore
+		return await project.items.updateByContentId(node_id, { priority: prio });
+	}
+
+	async addAssignee(channel: string, assignee: string): Promise<object> {
+		const { github, repo, owner } = this;
+
+		const issue = await github.search.issuesAndPullRequests({
+			q: `type:issue ${channel} repo:${owner}/${repo}`,
+			sort: 'created',
+		});
+
+		const { number } = issue.data.items[0];
+
+		const assigned = await github.issues.addAssignees({
+			owner: this.owner,
+			repo: this.repo,
+			issue_number: number,
+			assignees: [assignee],
+		});
+
+		return assigned;
+	}
 
 	async createCard(issueContentId: string, title: string) {
 		const { github, project } = this;
