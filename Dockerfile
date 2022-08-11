@@ -7,12 +7,17 @@ WORKDIR /tmp/app
 # Move package.json
 COPY package.json .
 
+RUN export NODE_ENV=production
+
+COPY prisma prisma
+RUN npx prisma generate
+
 # Install dependencies
 RUN npm install
 
+
 # Move source files
-COPY src ./src
-COPY tsconfig.json   .
+COPY . .
 
 # Build project
 RUN npm run build
@@ -29,8 +34,13 @@ COPY --from=build-runner /tmp/app/package.json /app/package.json
 # Install dependencies
 RUN npm install --only=production
 
+RUN export NODE_ENV=production
+
+COPY prisma prisma
+RUN npx prisma generate
+
 # Move build files
-COPY --from=build-runner /tmp/app/build /app/build
+COPY --from=build-runner /tmp/app/dist /app/dist
 
 # Start bot
-CMD [ "node", "build/main.js" ]
+CMD [ "npm", "run", "local" ]

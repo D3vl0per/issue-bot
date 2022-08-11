@@ -1,12 +1,20 @@
 version: '3'
+
 services:
-  app:
+  syncer:
     container_name: discord_bot
-    hostname: discordbot
+    hostname: discord_bot
     build: .
-    command: node build/main.js
+    command: node dist/entry.bot.js
     environment:
       - DC_BOT_TOKEN=${DC_BOT_TOKEN}
+      - DB_URL=${DB_URL}
+      - CHANNEL_NAMES=${CHANNEL_NAMES}
+      - GH_TOKEN=${GH_TOKEN}
+      - GH_ORG=${GH_ORG}
+    restart: on-failure
+    depends_on:
+      - postgres_db
     networks:
       botnet:
         ipv4_address: 10.10.13.2
@@ -38,7 +46,7 @@ services:
     container_name: pg_admin
     hostname: pgadmin
     image: dpage/pgadmin4
-    restart: always
+    restart: on-failure
     depends_on:
       - postgres_db
     environment:
