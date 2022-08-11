@@ -79,4 +79,8 @@ async function run() {
 	await bot.login(process.env.DC_BOT_TOKEN);
 }
 
+(BigInt.prototype as any).toJSON = function (): string {
+	return this.toString();
+};
+
 run();
