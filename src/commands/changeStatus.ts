@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js';
+import type { CommandInteraction } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx';
 import { getGuildInfo } from '../utils/dbFunctions.js';
 
@@ -7,21 +7,19 @@ import { Labels, labelsWithEmojis, stripStatusFromThread } from '../utils/utils.
 import { Description } from '@discordx/utilities';
 
 @Discord()
-export class UpdateLabel {
-	@Slash('label')
-	@Description('Sets label.')
+export class ChangeStatus {
+	@Slash('status')
+	@Description('Sets status.')
 	async changePriority(
 		@SlashChoice(...Labels)
 		@SlashOption('label', { description: 'Issue label', required: true })
 		label: string,
-		@SlashOption('x')
-		channel: string,
 		interaction: CommandInteraction
 	): Promise<void> {
 		const labelCleaned = label.replace('-', ' ');
 
 		await interaction.deferReply({ ephemeral: true });
-		await interaction.followUp(`You selected label: ${labelCleaned}`);
+		await interaction.followUp(`You selected status: ${labelCleaned}`);
 
 		const guildId: any = interaction.guildId;
 		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);

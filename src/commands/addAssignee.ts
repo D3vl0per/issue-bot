@@ -11,10 +11,10 @@ const gh = new GitHubService();
 
 @Discord()
 export class AddAssignee {
-	@Slash('addassignee')
+	@Slash('assign')
 	@Description('Adds user to the issue.')
 	async addAssignee(
-		@SlashOption('assignee', { description: 'GitHub username', required: true })
+		@SlashOption('username', { description: 'GitHub username', required: true })
 		assignee: string,
 		interaction: CommandInteraction
 	): Promise<void> {

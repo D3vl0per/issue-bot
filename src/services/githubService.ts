@@ -140,7 +140,7 @@ export class GitHubService {
 		});
 	}
 
-	async editIssueLabel(title: string, label: string | Array<string>) {
+	async editIssueLabel(title: string, label: string | Array<string>, updateIssue: Boolean) {
 		const { github, repo, owner, location } = this;
 
 		let issueNumber = 0;
@@ -154,12 +154,14 @@ export class GitHubService {
 
 				this.editProject(node_id, String(label));
 
-				github.issues.update({
-					issue_number: Number(number),
-					owner: owner,
-					repo: repo,
-					labels: [...label],
-				});
+				if (updateIssue) {
+					github.issues.update({
+						issue_number: Number(number),
+						owner: owner,
+						repo: repo,
+						labels: [...label],
+					});
+				}
 			})
 			.catch((e: Error) => {
 				// console.log('Bruh.', e);

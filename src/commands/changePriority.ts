@@ -11,7 +11,7 @@ const gh = new GitHubService();
 
 @Discord()
 export class ChangePriority {
-	@Slash('changepriority')
+	@Slash('priority')
 	@Description('Sets priority.')
 	async changePriority(
 		@SlashChoice(...Priorities)

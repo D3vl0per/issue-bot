@@ -12,7 +12,7 @@ const gh = new GitHubService();
 
 @Discord()
 export class EditIssue {
-	@Slash('editissue')
+	@Slash('issue')
 	@Description('Edits issue title and body via a modal.')
 	async attachment(interaction: CommandInteraction): Promise<void> {
 		if (!interaction.channel?.isThread()) {
