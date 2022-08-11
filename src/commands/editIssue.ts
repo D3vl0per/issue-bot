@@ -59,12 +59,12 @@ export class EditIssue {
 		const guildId: any = interaction.guildId;
 		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
 
+		interaction.channel.setName(`${status} - ${issueTitle}`);
+
 		await gh.populate(guildId, repo_owner, repo_name, project_id);
 		await gh.editIssue(stripStatusFromThread(interaction.channel.name), issueTitle, issueBody);
 
-		await interaction.channel.setName(`${status} - ${issueTitle}`);
-
-		interaction.reply({
+		await interaction.reply({
 			content: `issue title: ${issueTitle}, issue body: ${issueBody}`,
 			ephemeral: true,
 		});

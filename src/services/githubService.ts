@@ -93,7 +93,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -126,7 +126,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -162,7 +162,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -200,7 +200,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});
@@ -227,7 +227,7 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				console.log('Bruh.', e);
+				// console.log('Bruh.', e);
 
 				return 'Issue not found.';
 			});

@@ -67,10 +67,10 @@ export class SetUp {
 		await insertGuildInfo(String(guildId), String(interaction.channelId), repoOwner, repoName, projectID);
 		await gh.populate(String(guildId), repoOwner, repoName, projectID);
 
-		await interaction.deferReply({ ephemeral: true });
-		await interaction.reply(
-			`Successful setup with ${projectID} project, ${repoName} repository and ${repoOwner} owner.`
-		);
+		await interaction.reply({
+			content: `Successful setup with ${projectID} project, ${repoName} repository and ${repoOwner} owner.`,
+			ephemeral: true,
+		});
 
 		return;
 	}

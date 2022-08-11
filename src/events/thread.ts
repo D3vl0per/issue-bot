@@ -40,7 +40,7 @@ export class ThreadHandler {
 			issueObj.status = data.labels[0];
 			issueObj.issueLink = data.html_url;
 		} catch (e) {
-			console.log('Bruh.', e);
+			// console.log('Bruh.', e);
 			thread.send('Missing settings, please set me up.');
 			return;
 		}
