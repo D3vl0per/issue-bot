@@ -33,8 +33,8 @@ export class ThreadHandler {
 
 			await gh.populate(guildId, repo_owner, repo_name, project_id);
 			const { data } = await gh.createIssue(name, name, ['Backlog']);
-			const status = labelsWithEmojis.find((label) => label.label === 'Backlog')?.emoji;
-			thread.setName(`${status} - ${name}`);
+			// const status = labelsWithEmojis.find((label) => label.label === 'Backlog')?.emoji;
+			thread.setName(`${name}`);
 
 			issueObj.id = data.number;
 			issueObj.status = data.labels[0];
@@ -72,8 +72,8 @@ export class ThreadHandler {
 	}
 	@On('threadUpdate')
 	async onThreadUpdate([oldThread, newThread]: ArgsOf<'threadUpdate'>, client: Client): Promise<void> {
-		const oldName = stripStatusFromThread(oldThread.name);
-		const newName = stripStatusFromThread(newThread.name);
+		const oldName = oldThread.name;
+		const newName = newThread.name;
 
 		const { guildId } = newThread;
 		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
@@ -103,7 +103,7 @@ export class ThreadHandler {
 	async onThreadDelete([thread]: ArgsOf<'threadDelete'>, client: Client): Promise<void> {
 		const { name } = thread;
 
-		console.log('Thread deleted', stripStatusFromThread(name));
+		console.log('Thread deleted', name);
 
 		const { guildId } = thread;
 
@@ -115,7 +115,7 @@ export class ThreadHandler {
 		gh.toggleLockIssue(name);
 	}
 	@On('threadListSync')
-	async onThreadSync([guild]: ArgsOf<'threadListSync'>, client: Client): Promise<void> {
-		console.log('Threads were synced in ', guild);
+	async onThreadSync([threads]: ArgsOf<'threadListSync'>, client: Client): Promise<void> {
+		console.log(`${threads.size} thread(s) were synced.`);
 	}
 }

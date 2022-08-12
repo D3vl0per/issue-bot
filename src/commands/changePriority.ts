@@ -31,7 +31,7 @@ export class ChangePriority {
 			await gh.populate(guildId, repo_owner, repo_name, project_id);
 
 			// @ts-ignore - Interaction name broken it exists but throws error
-			gh.setPriority(stripStatusFromThread(interaction.channel.name), prio);
+			gh.setPriority(interaction.channel.name, prio);
 
 			await interaction.reply({
 				content: `Priority: ${prio}`,

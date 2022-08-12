@@ -28,12 +28,12 @@ export class UpdateLabel {
 
 		await gh.populate(guildId, repo_owner, repo_name, project_id);
 		// @ts-ignore
-		await gh.editIssueLabel(stripStatusFromThread(interaction.channel.name), [labelCleaned], false);
+		await gh.editIssueLabel(interaction.channel.name, [labelCleaned], true);
 
 		const status = labelsWithEmojis.find((labels) => labels.label === labelCleaned)?.emoji;
 
 		// @ts-ignore
-		await interaction.channel.setName(`${status} - ${stripStatusFromThread(interaction.channel.name)}`);
+		// await interaction.channel.setName(`${status} - ${stripStatusFromThread(interaction.channel.name)}`);
 
 		return;
 	}

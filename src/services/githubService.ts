@@ -152,8 +152,6 @@ export class GitHubService {
 			.then((query) => {
 				const { number, node_id } = query.data.items[0];
 
-				this.editProject(node_id, String(label));
-
 				if (updateIssue) {
 					github.issues.update({
 						issue_number: Number(number),
@@ -161,7 +159,11 @@ export class GitHubService {
 						repo: repo,
 						labels: [...label],
 					});
+
+					return;
 				}
+
+				this.editProject(node_id, String(label));
 			})
 			.catch((e: Error) => {
 				// console.log('Bruh.', e);

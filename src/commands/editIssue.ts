@@ -62,7 +62,7 @@ export class EditIssue {
 		interaction.channel.setName(`${status} - ${issueTitle}`);
 
 		await gh.populate(guildId, repo_owner, repo_name, project_id);
-		await gh.editIssue(stripStatusFromThread(interaction.channel.name), issueTitle, issueBody);
+		await gh.editIssue(interaction.channel.name, issueTitle, issueBody);
 
 		await interaction.reply({
 			content: `issue title: ${issueTitle}, issue body: ${issueBody}`,

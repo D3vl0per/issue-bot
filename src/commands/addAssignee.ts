@@ -32,10 +32,10 @@ export class AddAssignee {
 			const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
 
 			await gh.populate(guildId, repo_owner, repo_name, project_id);
-			await gh.addAssignee(stripStatusFromThread(channelName), assignee);
+			await gh.addAssignee(channelName, assignee);
 
 			await interaction.reply({
-				content: `${assignee} user is assigned to ${stripStatusFromThread(channelName)} issue.`,
+				content: `${assignee} user is assigned to ${channelName} issue.`,
 				ephemeral: true,
 			});
 		} catch (error) {
