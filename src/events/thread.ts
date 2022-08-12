@@ -1,6 +1,6 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, ThreadAutoArchiveDuration } from 'discord.js';
 
 import { getGuildInfo, isGuildExists } from '../utils/dbFunctions.js';
 
@@ -14,6 +14,8 @@ export class ThreadHandler {
 	@On('threadCreate')
 	async onThreadCreate([thread]: ArgsOf<'threadCreate'>, client: Client): Promise<void> {
 		const { name, guildId } = thread;
+
+		thread.setAutoArchiveDuration(ThreadAutoArchiveDuration.OneWeek);
 
 		let issueEmbed: any;
 		let issueObj: any = {};
