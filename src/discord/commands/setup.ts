@@ -2,9 +2,11 @@ import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { Discord, ModalComponent, Slash } from 'discordx';
-import { insertGuildInfo, isGuildExists } from '../utils/dbFunctions.js';
+import { insertGuildInfo, isGuildExists } from '../../utils/dbFunctions.js';
 
-import { gh } from '../services/githubService.js';
+import { GitHubService, gh } from '../../services/githubService.js';
+
+// const gh = new GitHubService();
 import { Description } from '@discordx/utilities';
 
 @Discord()
@@ -64,7 +66,8 @@ export class SetUp {
 
 		const { guildId } = interaction;
 
-		await insertGuildInfo(String(guildId), String(interaction.channelId), repoOwner, repoName, projectID);
+		// await insertGuildInfo(String(guildId), String(interaction.channelId), repoOwner, repoName, projectID);
+		gh.init();
 		await gh.populate(String(guildId), repoOwner, repoName, projectID);
 
 		await interaction.reply({

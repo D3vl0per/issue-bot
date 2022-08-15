@@ -1,13 +1,13 @@
 import type { CommandInteraction } from 'discord.js';
 
 import { Discord, Slash, SlashOption } from 'discordx';
-import { getGuildInfo } from '../utils/dbFunctions.js';
+import { getGuildInfo } from '../../utils/dbFunctions.js';
 
-import { GitHubService } from '../services/githubService.js';
-import { stripStatusFromThread } from '../utils/utils.js';
+import { GitHubService, gh } from '../../services/githubService.js';
+
+// const gh = new GitHubService();
+import { stripStatusFromThread } from '../../utils/utils.js';
 import { Description } from '@discordx/utilities';
-
-const gh = new GitHubService();
 
 @Discord()
 export class AddAssignee {
@@ -28,10 +28,10 @@ export class AddAssignee {
 			const { guildId }: any = interaction;
 
 			// @ts-ignore - Interaction name broken it exists but throws error
-			const channelName = interaction.channel?.name;
-			const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-			await gh.populate(guildId, repo_owner, repo_name, project_id);
+			const channelName = stripStatusFromThread(interaction.channel?.name);
+			const { repo, owner, projectId } = gh.getData();
+			gh.init();
+			await gh.populate(guildId, owner, repo, String(projectId));
 			await gh.addAssignee(channelName, assignee);
 
 			await interaction.reply({

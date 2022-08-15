@@ -16,8 +16,8 @@
     "baseUrl": "./",
     "paths": {
       "@services/*": ["src/services"],
-      "@commands/*": ["src/commands/*"],
-      "@events/*": ["src/events/*"]
+      "@commands/*": ["src/discord/commands/*"],
+      "@events/*": ["src/discord/events/*"]
     },
   },
   "exclude": ["node_modules", "build", "dist"]

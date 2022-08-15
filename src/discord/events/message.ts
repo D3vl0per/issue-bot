@@ -1,6 +1,6 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
-import { stripStatusFromThread } from '../utils/utils.js';
+import { stripStatusFromThread } from '../../utils/utils.js';
 
 @Discord()
 export class MessageHandler {
