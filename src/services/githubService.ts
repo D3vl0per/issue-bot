@@ -6,23 +6,43 @@ import GitHubProject from 'github-project';
 
 export class GitHubService {
 	public github: Octokit;
-	private guildId: string;
-	private repo: string;
-	private owner: string;
-	private location: string;
-	private projectId: Number;
-	private labels: Array<string>;
-	private project: GitHubProject;
+	public guildId: string;
+	public repo: string;
+	public owner: string;
+	public location: string;
+	public projectId: Number;
+	public labels: Array<string>;
+	public project: GitHubProject;
 
 	constructor() {
 		this.github = new Octokit({
-			auth: process.env.GH_TOKEN,
+			auth: env.GH_TOKEN,
 		});
-		this.guildId = 'N/A';
-		this.repo = 'N/A';
-		this.owner = 'N/A';
+		this.guildId = String(env.GUILD_ID);
+		this.repo = String(env.GH_REPO);
+		this.owner = String(env.GH_ORG);
 		this.location = `${this.repo}/${this.repo}`;
-		this.projectId = 0;
+		this.projectId = Number(env.GH_PROJECT_NUMBER);
+		this.project = new GitHubProject({
+			org: String(env.GH_ORG),
+			number: Number(env.GH_PROJECT_NUMBER),
+			token: String(env.GH_TOKEN),
+			fields: {
+				priority: 'Priority',
+			},
+		});
+		this.labels = ['Backlog', 'Todo', 'In-Progress', 'Testing', 'Done'];
+	}
+
+	init() {
+		this.github = new Octokit({
+			auth: env.GH_TOKEN,
+		});
+		this.guildId = String(env.GUILD_ID);
+		this.repo = String(env.GH_REPO);
+		this.owner = String(env.GH_ORG);
+		this.location = `${this.repo}/${this.repo}`;
+		this.projectId = Number(env.GH_PROJECT_NUMBER);
 		this.project = new GitHubProject({
 			org: String(env.GH_ORG),
 			number: Number(env.GH_PROJECT_NUMBER),
@@ -314,6 +334,10 @@ export class GitHubService {
 		const { project } = this;
 
 		return await project.items.list();
+	}
+
+	getData() {
+		return this;
 	}
 }
 
