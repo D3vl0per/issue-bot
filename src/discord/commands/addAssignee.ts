@@ -36,18 +36,25 @@ export class AddAssignee {
 			await gh.addAssignee(channelName, assignee);
 
 			const assigneeEmbed = new EmbedBuilder()
-				.setColor(config.DC_COLOR as any)
+				.setColor(config.DC_COLORS.SUCCESS as any)
 				.setTitle(`🧑 \`${assignee}\` assigned to \`${channelName}\` issue successfully.`);
 
 			await interaction.reply({
 				embeds: [assigneeEmbed],
 				ephemeral: true,
 			});
-		} catch (error) {
-			await interaction.reply({
-				content: String(error),
+		} catch (error: unknown) {
+			const errorEmbed = new EmbedBuilder()
+				.setTitle('❌ An error occurred.')
+				.setDescription(`\`${JSON.stringify(error)}\``)
+				.setColor(config.DC_COLORS.ERROR as any);
+
+			interaction.reply({
 				ephemeral: true,
+				embeds: [errorEmbed],
 			});
+
+			return;
 		}
 	}
 }

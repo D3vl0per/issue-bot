@@ -25,7 +25,7 @@ export class UpdateLabel {
 			// await interaction.followUp(`You selected label: ${label}`);
 
 			const labelEmbed = new EmbedBuilder()
-				.setColor(config.DC_COLOR as any)
+				.setColor(config.DC_COLORS.SUCCESS as any)
 				.setTitle(`🏷️ Label(s) set to \`${label}\` successfully.`);
 
 			// const guildId: any = interaction.guildId;
@@ -44,11 +44,18 @@ export class UpdateLabel {
 				ephemeral: true,
 				embeds: [labelEmbed],
 			});
-		} catch (e: unknown) {
+		} catch (error: unknown) {
+			const errorEmbed = new EmbedBuilder()
+				.setTitle('❌ An error occurred.')
+				.setDescription(`\`${JSON.stringify(error)}\``)
+				.setColor(config.DC_COLORS.ERROR as any);
+
 			interaction.reply({
 				ephemeral: true,
-				content: String(e),
+				embeds: [errorEmbed],
 			});
+
+			return;
 		}
 
 		return;

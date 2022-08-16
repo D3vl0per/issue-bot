@@ -264,7 +264,7 @@ export class GitHubService {
 				org: owner,
 			});
 			return true;
-		} catch (error) {
+		} catch (error: unknown) {
 			return false;
 		}
 	}

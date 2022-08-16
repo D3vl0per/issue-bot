@@ -15,7 +15,7 @@ import { config } from '../../config.js';
 export class ThreadHandler {
 	@On('threadCreate')
 	async onThreadCreate([thread]: ArgsOf<'threadCreate'>, client: Client): Promise<void> {
-		const { name, guildId } = thread;
+		const { name } = thread;
 
 		thread.setAutoArchiveDuration(ThreadAutoArchiveDuration.OneWeek);
 
@@ -45,14 +45,21 @@ export class ThreadHandler {
 			issueObj.id = data.number;
 			issueObj.status = data.labels[0];
 			issueObj.issueLink = data.html_url;
-		} catch (e) {
-			console.log('Bruh.', e);
-			thread.send('Missing settings, please set me up.');
+		} catch (error: unknown) {
+			const errorEmbed = new EmbedBuilder()
+				.setTitle('❌ An error occurred.')
+				.setDescription(`\`${JSON.stringify(error)}\``)
+				.setColor(config.DC_COLORS.ERROR as any);
+
+			thread.send({
+				embeds: [errorEmbed],
+			});
+
 			return;
 		}
 
 		issueEmbed = new EmbedBuilder()
-			.setColor(config.DC_COLOR as any)
+			.setColor(config.DC_COLORS.EMBED as any)
 			.setTitle(name)
 			.setURL(issueObj.issueLink)
 			.setDescription('Issue created.')
@@ -60,12 +67,12 @@ export class ThreadHandler {
 				{
 					name: `ID`,
 					value: `${issueObj.id}`,
-					inline: false,
+					inline: true,
 				},
 				{
 					name: `Status`,
 					value: `${issueObj.status.name}`,
-					inline: false,
+					inline: true,
 				}
 			)
 			.setTimestamp()
