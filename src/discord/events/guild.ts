@@ -18,29 +18,25 @@ export class GuildHandler {
 			)
 			.addFields([
 				{
-					name: `🛠️ Setup`,
-					value: `Use the \`/setup\` slash command to set me up with the corresponding repo and channel.\n\n`,
-				},
-				{
 					name: `*️⃣ Create Issue`,
 					value: `An issue will be created when a new thread is made under the corresponding channel.\n\n`,
 				},
 				{
 					name: `✏️ Edit Issue`,
-					value: `To edit an issue use the \`/editissue\` slash command.\n\n`,
+					value: `To edit an issue use the \`/issue\` slash command.\n\n`,
 				},
 				{
 					name: `✅ Update Label`,
-					value: `Use the \`/updatelabel\` command.\n\n`,
+					value: `Use the \`/label\` command.\n\n`,
 				},
 				{
 					name: `❌ Close or Delete an Issue`,
 					value: `Archive or Lock the thread to close/lock the issue.\n\nUnfortunately, it's not possible to delete Issues, yet.\n\n`,
 				},
-				{
-					name: `🚩 Help the developers.`,
-					value: `Use the \`/feedback\` command to give feedback about anything related to the BOT.\n\n\`Note: With GitHub and other API related Issues unfortunately we can't help. 😢\`\n\n`,
-				},
+				// {
+				// 	name: `🚩 Help the developers.`,
+				// 	value: `Use the \`/feedback\` command to give feedback about anything related to the BOT.\n\n\`Note: With GitHub and other API related Issues unfortunately we can't help. 😢\`\n\n`,
+				// },
 			])
 			.setThumbnail(String(client.user?.displayAvatarURL()))
 			.setFooter({

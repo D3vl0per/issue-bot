@@ -1,18 +1,16 @@
-import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
+import { config } from '../../config.js';
+
+import { CommandInteraction, EmbedBuilder, ModalSubmitInteraction } from 'discord.js';
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
-
 import { Discord, ModalComponent, Slash } from 'discordx';
-import { getGuildInfo } from '../utils/dbFunctions.js';
-
-import { GitHubService } from '../services/githubService.js';
-import { stripStatusFromThread } from '../utils/utils.js';
 import { Description } from '@discordx/utilities';
 
-const gh = new GitHubService();
+import { stripStatusFromThread } from '../../utils/discord.js';
+import { gh } from '../../services/githubService.js';
 
 @Discord()
 export class EditIssue {
-	@Slash('editissue')
+	@Slash('issue')
 	@Description('Edits issue title and body via a modal.')
 	async attachment(interaction: CommandInteraction): Promise<void> {
 		if (!interaction.channel?.isThread()) {
@@ -56,18 +54,22 @@ export class EditIssue {
 
 		const [issueTitle, issueBody] = ['issueTitle', 'issueBody'].map((id) => interaction.fields.getTextInputValue(id));
 		const status = interaction.channel.name.split(' ')[0];
-		const guildId: any = interaction.guildId;
-		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
+		// const guildId: any = interaction.guildId;
+		// const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
 
-		interaction.channel.setName(`${status} - ${issueTitle}`);
-
-		await gh.populate(guildId, repo_owner, repo_name, project_id);
+		// await gh.populate(guildId, repo_owner, repo_name, project_id);
 		await gh.editIssue(stripStatusFromThread(interaction.channel.name), issueTitle, issueBody);
 
+		const issueEmbed = new EmbedBuilder()
+			.setColor(config.DC_COLORS.SUCCESS as any)
+			.setTitle(`✨ Issue \`${issueTitle}\` updated successfully.`);
+
 		await interaction.reply({
-			content: `issue title: ${issueTitle}, issue body: ${issueBody}`,
+			embeds: [issueEmbed],
 			ephemeral: true,
 		});
+
+		interaction.channel.setName(`${status} - ${issueTitle}`);
 
 		return;
 	}

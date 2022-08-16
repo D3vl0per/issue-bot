@@ -1,17 +1,15 @@
-import type { CommandInteraction } from 'discord.js';
+import { config } from '../../config.js';
 
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx';
-import { getGuildInfo } from '../utils/dbFunctions.js';
-
-import { GitHubService } from '../services/githubService.js';
-import { Priorities, stripStatusFromThread } from '../utils/utils.js';
 import { Description } from '@discordx/utilities';
 
-const gh = new GitHubService();
+import { Priorities, stripStatusFromThread } from '../../utils/discord.js';
+import { gh } from '../../services/githubService.js';
 
 @Discord()
 export class ChangePriority {
-	@Slash('changepriority')
+	@Slash('priority')
 	@Description('Sets priority.')
 	async changePriority(
 		@SlashChoice(...Priorities)
@@ -25,23 +23,31 @@ export class ChangePriority {
 		}
 
 		try {
-			const guildId: any = interaction.guildId;
-			const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-			await gh.populate(guildId, repo_owner, repo_name, project_id);
+			gh.init();
 
 			// @ts-ignore - Interaction name broken it exists but throws error
 			gh.setPriority(stripStatusFromThread(interaction.channel.name), prio);
 
+			const priorityEmbed = new EmbedBuilder()
+				.setColor(config.DC_COLORS.SUCCESS as any)
+				.setTitle(`💈 Priority updated to \`${prio}\` successfully.`);
+
 			await interaction.reply({
-				content: `Priority: ${prio}`,
+				embeds: [priorityEmbed],
 				ephemeral: true,
 			});
-		} catch (error) {
-			await interaction.reply({
-				content: String(error),
+		} catch (error: unknown) {
+			const errorEmbed = new EmbedBuilder()
+				.setTitle('❌ An error occurred.')
+				.setDescription(`\`${JSON.stringify(error)}\``)
+				.setColor(config.DC_COLORS.ERROR as any);
+
+			interaction.reply({
 				ephemeral: true,
+				embeds: [errorEmbed],
 			});
+
+			return;
 		}
 	}
 }

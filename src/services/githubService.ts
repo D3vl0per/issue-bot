@@ -1,32 +1,54 @@
-import { env } from 'process';
-import { capitalize, sleep } from '../utils/utils.js';
+import { config } from '../config.js';
 
 import { Octokit } from '@octokit/rest';
 import GitHubProject from 'github-project';
 
+import { capitalize, sleep } from '../utils/helpers.js';
+
 export class GitHubService {
 	public github: Octokit;
-	private guildId: string;
-	private repo: string;
-	private owner: string;
-	private location: string;
-	private projectId: Number;
-	private labels: Array<string>;
-	private project: GitHubProject;
+	public guildId: string;
+	public repo: string;
+	public owner: string;
+	public location: string;
+	public projectId: Number;
+	public labels: Array<string>;
+	public project: GitHubProject;
 
 	constructor() {
 		this.github = new Octokit({
-			auth: process.env.GH_TOKEN,
+			auth: config.GH_TOKEN,
 		});
-		this.guildId = 'N/A';
-		this.repo = 'N/A';
-		this.owner = 'N/A';
+		this.guildId = config.GUILD_ID;
+		this.repo = config.GH_REPO;
+		this.owner = config.GH_ORG;
 		this.location = `${this.repo}/${this.repo}`;
-		this.projectId = 0;
+		this.projectId = config.GH_PROJECT_NUMBER;
 		this.project = new GitHubProject({
-			org: String(env.GH_ORG),
-			number: Number(env.GH_PROJECT_NUMBER),
-			token: String(env.GH_TOKEN),
+			org: config.GH_ORG,
+			number: config.GH_PROJECT_NUMBER,
+			token: config.GH_TOKEN,
+			fields: {
+				priority: 'Priority',
+			},
+		});
+		this.labels = ['Backlog', 'Todo', 'In-Progress', 'Testing', 'Done'];
+	}
+
+	// Reinit to counter weird process handling
+	init() {
+		this.github = new Octokit({
+			auth: config.GH_TOKEN,
+		});
+		this.guildId = config.GUILD_ID;
+		this.repo = config.GH_REPO;
+		this.owner = config.GH_ORG;
+		this.location = `${this.repo}/${this.repo}`;
+		this.projectId = config.GH_PROJECT_NUMBER;
+		this.project = new GitHubProject({
+			org: config.GH_ORG,
+			number: config.GH_PROJECT_NUMBER,
+			token: config.GH_TOKEN,
 			fields: {
 				priority: 'Priority',
 			},
@@ -93,18 +115,12 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
 
 	async editIssue(oldTitle: string, newTitle: string, issueBody: string) {
-		const { github, repo, owner, location } = this;
-
-		// console.log(oldTitle);
-		// console.log(newTitle);
-		// console.log(issueBody);
+		const { github, repo, owner } = this;
 
 		github.search
 			.issuesAndPullRequests({
@@ -114,7 +130,7 @@ export class GitHubService {
 			.then((query) => {
 				const { number, labels, node_id } = query.data.items[0];
 
-				this.editProject(node_id, capitalize(String(labels[0].name)));
+				// this.editProject(node_id, capitalize(String(labels[0].name)));
 
 				github.issues.update({
 					issue_number: Number(number),
@@ -126,8 +142,6 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
@@ -140,8 +154,8 @@ export class GitHubService {
 		});
 	}
 
-	async editIssueLabel(title: string, label: string | Array<string>) {
-		const { github, repo, owner, location } = this;
+	async editIssueLabel(title: string, label: string | Array<string>, updateIssue: Boolean) {
+		const { github, repo, owner } = this;
 
 		let issueNumber = 0;
 
@@ -152,24 +166,26 @@ export class GitHubService {
 			.then((query) => {
 				const { number, node_id } = query.data.items[0];
 
-				this.editProject(node_id, String(label));
+				if (updateIssue) {
+					github.issues.update({
+						issue_number: Number(number),
+						owner: owner,
+						repo: repo,
+						labels: [...label],
+					});
 
-				github.issues.update({
-					issue_number: Number(number),
-					owner: owner,
-					repo: repo,
-					labels: [...label],
-				});
+					return;
+				}
+
+				this.editProject(node_id, String(label));
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
 
 	async toggleLockIssue(title: string) {
-		const { github, repo, owner, location } = this;
+		const { github, repo, owner } = this;
 		let issueNumber = 0;
 
 		github.search
@@ -200,14 +216,12 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
 
 	async toggleIssue(title: string) {
-		const { github, repo, owner, location } = this;
+		const { github, repo, owner } = this;
 
 		github.search
 			.issuesAndPullRequests({
@@ -227,8 +241,6 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
@@ -239,7 +251,7 @@ export class GitHubService {
 				org: owner,
 			});
 			return true;
-		} catch (error) {
+		} catch (error: unknown) {
 			return false;
 		}
 	}
@@ -279,7 +291,7 @@ export class GitHubService {
 	}
 
 	async createCard(issueContentId: string, title: string) {
-		const { github, project } = this;
+		const { project } = this;
 
 		return await project.items.add(issueContentId, {
 			title: title,
@@ -297,7 +309,7 @@ export class GitHubService {
 	}
 
 	async updateCard(oldTitle: string, newTitle: string) {
-		const { github, project, getCard } = this;
+		const { project, getCard } = this;
 
 		const card: any = await getCard('title');
 
@@ -311,6 +323,11 @@ export class GitHubService {
 
 		return await project.items.list();
 	}
+
+	getData() {
+		return this;
+	}
 }
 
 export const gh = new GitHubService();
+gh.init();

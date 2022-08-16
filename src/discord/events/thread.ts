@@ -1,52 +1,54 @@
+import { config } from '../../config.js';
+
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, ThreadAutoArchiveDuration } from 'discord.js';
 
-import { getGuildInfo, isGuildExists } from '../utils/dbFunctions.js';
-
-import { GitHubService } from '../services/githubService.js';
-import { labelsWithEmojis, stripStatusFromThread } from '../utils/utils.js';
-
-const gh = new GitHubService();
+import { stripStatusFromThread } from '../../utils/discord.js';
+import { labelsWithEmojis } from '../../utils/discord.js';
+import { gh } from '../../services/githubService.js';
 
 @Discord()
 export class ThreadHandler {
 	@On('threadCreate')
 	async onThreadCreate([thread]: ArgsOf<'threadCreate'>, client: Client): Promise<void> {
-		const { name, guildId } = thread;
+		const { name } = thread;
+
+		thread.setAutoArchiveDuration(ThreadAutoArchiveDuration.OneWeek);
 
 		let issueEmbed: any;
 		let issueObj: any = {};
 
-		const validChannels = process.env.CHANNEL_NAMES?.split(',');
+		const validChannels = config.CHANNEL_IDS?.split(',');
+
 		if (!validChannels?.includes(String(thread.parentId))) return;
 
 		try {
-			const exists = await isGuildExists(guildId);
+			gh.init();
 
-			if (!exists) {
-				thread.send('Missing settings, please set me up.');
-				return;
-			}
-
-			const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-			await gh.populate(guildId, repo_owner, repo_name, project_id);
 			const { data } = await gh.createIssue(name, name, ['Backlog']);
 			const status = labelsWithEmojis.find((label) => label.label === 'Backlog')?.emoji;
+
 			thread.setName(`${status} - ${name}`);
 
 			issueObj.id = data.number;
 			issueObj.status = data.labels[0];
 			issueObj.issueLink = data.html_url;
-		} catch (e) {
-			// console.log('Bruh.', e);
-			thread.send('Missing settings, please set me up.');
+		} catch (error: unknown) {
+			const errorEmbed = new EmbedBuilder()
+				.setTitle('❌ An error occurred.')
+				.setDescription(`\`${JSON.stringify(error)}\``)
+				.setColor(config.DC_COLORS.ERROR as any);
+
+			thread.send({
+				embeds: [errorEmbed],
+			});
+
 			return;
 		}
 
 		issueEmbed = new EmbedBuilder()
-			.setColor('#4F53F1')
+			.setColor(config.DC_COLORS.EMBED as any)
 			.setTitle(name)
 			.setURL(issueObj.issueLink)
 			.setDescription('Issue created.')
@@ -54,12 +56,12 @@ export class ThreadHandler {
 				{
 					name: `ID`,
 					value: `${issueObj.id}`,
-					inline: false,
+					inline: true,
 				},
 				{
 					name: `Status`,
 					value: `${issueObj.status.name}`,
-					inline: false,
+					inline: true,
 				}
 			)
 			.setTimestamp()
@@ -75,28 +77,26 @@ export class ThreadHandler {
 		const oldName = stripStatusFromThread(oldThread.name);
 		const newName = stripStatusFromThread(newThread.name);
 
-		const { guildId } = newThread;
-		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-		await gh.populate(guildId, repo_owner, repo_name, project_id);
+		gh.init();
 
 		if (newThread.archived) {
 			console.log('THREAD > Archived.');
-			// Lock and close issue
+
 			gh.toggleIssue(oldName);
 			gh.toggleLockIssue(oldName);
+
 			return;
 		}
 
 		if (oldThread.archived && !newThread.archived) {
 			console.log('THREAD > Unarchived.');
-			// Unlock and open issue
+
 			gh.toggleIssue(newName);
 			gh.toggleLockIssue(newName);
+
 			return;
 		}
 
-		// Just simply edit the issue based on name change
 		gh.editIssueWoBody(oldName, newName);
 	}
 	@On('threadDelete')
@@ -105,17 +105,13 @@ export class ThreadHandler {
 
 		console.log('Thread deleted', stripStatusFromThread(name));
 
-		const { guildId } = thread;
-
-		const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-		await gh.populate(guildId, repo_owner, repo_name, project_id);
+		gh.init();
 
 		gh.toggleIssue(name);
 		gh.toggleLockIssue(name);
 	}
 	@On('threadListSync')
-	async onThreadSync([guild]: ArgsOf<'threadListSync'>, client: Client): Promise<void> {
-		console.log('Threads were synced in ', guild);
+	async onThreadSync([threads]: ArgsOf<'threadListSync'>, client: Client): Promise<void> {
+		console.log(`${threads.size} thread(s) were synced.`);
 	}
 }
