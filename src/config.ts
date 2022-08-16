@@ -7,7 +7,11 @@ dotenv.config();
 export const config = {
 	NODE_ENV: String(env.NODE_ENV),
 	DC_BOT_TOKEN: String(env.DC_BOT_TOKEN),
-	DC_COLOR: String(env.DC_COLOR),
+	DC_COLORS: {
+		ERROR: String(env.DC_ERROR_COLOR),
+		EMBED: String(env.DC_EMBED_COLOR),
+		SUCCESS: String(env.DC_SUCCESS_COLOR),
+	},
 	CHANNEL_IDS: String(env.CHANNEL_IDS),
 	GUILD_ID: String(env.GUILD_ID),
 	GH_ORG: String(env.GH_ORG),
