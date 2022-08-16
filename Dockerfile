@@ -9,12 +9,8 @@ COPY package.json .
 
 RUN export NODE_ENV=production
 
-COPY prisma prisma
-RUN npx prisma generate
-
 # Install dependencies
 RUN npm install
-
 
 # Move source files
 COPY . .
@@ -36,11 +32,8 @@ RUN npm install --only=production
 
 RUN export NODE_ENV=production
 
-COPY prisma prisma
-RUN npx prisma generate
-
 # Move build files
 COPY --from=build-runner /tmp/app/dist /app/dist
 
 # Start bot
-CMD [ "npm", "run", "local" ]
+CMD [ "npm", "run", "serve" ]

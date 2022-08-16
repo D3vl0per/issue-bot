@@ -5,58 +5,21 @@ services:
     container_name: discord_bot
     hostname: discord_bot
     build: .
-    command: node dist/entry.bot.js
+    command: node dist/index.js
     environment:
+      - NODE_ENV=production
+      - CHANNEL_IDS=${CHANNEL_IDS}
+      - GUILD_ID=${GUILD_ID}
       - DC_BOT_TOKEN=${DC_BOT_TOKEN}
-      - DB_URL=${DB_URL}
-      - CHANNEL_NAMES=${CHANNEL_NAMES}
-      - GH_TOKEN=${GH_TOKEN}
+      - DC_COLOR=${DC_COLOR}
       - GH_ORG=${GH_ORG}
+      - GH_REPO=${GH_REPO}
+      - GH_PROJECT_NUMBER=${GH_PROJECT_NUMBER}
+      - GH_TOKEN=${GH_TOKEN}
     restart: on-failure
-    depends_on:
-      - postgres_db
-    networks:
-      botnet:
-        ipv4_address: 10.10.13.2
-
-  postgres_db:
-    container_name: postgres_db
-    hostname: postgres
-    image: 'postgres:latest'
-    ports:
-      - 5432:5432
-      - 5433:5433
-    # Init only
-    # volumes:
-    #   - ./deployment/db:/docker-entrypoint-initdb.d
-    # volumes:
-    #   - ./data/postgres:/var/lib/postgresql/data
-    volumes:
-      - ./src/scripts/:/docker-entrypoint-initdb.d
-    restart: on-failure
-    environment:
-      POSTGRES_USER: sync
-      POSTGRES_PASSWORD: supersecretpassword
-      POSTGRES_DB: sync-db
     networks:
       botnet:
         ipv4_address: 10.10.13.3
-
-  pg_admin:
-    container_name: pg_admin
-    hostname: pgadmin
-    image: dpage/pgadmin4
-    restart: on-failure
-    depends_on:
-      - postgres_db
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@sync.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - '5050:80'
-    networks:
-      botnet:
-        ipv4_address: 10.10.13.4
 
 networks:
   botnet:
