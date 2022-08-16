@@ -1,8 +1,9 @@
 import { config } from '../config.js';
-import { capitalize, sleep } from '../utils/helpers.js';
 
 import { Octokit } from '@octokit/rest';
 import GitHubProject from 'github-project';
+
+import { capitalize, sleep } from '../utils/helpers.js';
 
 export class GitHubService {
 	public github: Octokit;
@@ -114,18 +115,12 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
 
 	async editIssue(oldTitle: string, newTitle: string, issueBody: string) {
-		const { github, repo, owner, location } = this;
-
-		// console.log(oldTitle);
-		// console.log(newTitle);
-		// console.log(issueBody);
+		const { github, repo, owner } = this;
 
 		github.search
 			.issuesAndPullRequests({
@@ -147,8 +142,6 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
@@ -162,7 +155,7 @@ export class GitHubService {
 	}
 
 	async editIssueLabel(title: string, label: string | Array<string>, updateIssue: Boolean) {
-		const { github, repo, owner, location } = this;
+		const { github, repo, owner } = this;
 
 		let issueNumber = 0;
 
@@ -187,14 +180,12 @@ export class GitHubService {
 				this.editProject(node_id, String(label));
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
 
 	async toggleLockIssue(title: string) {
-		const { github, repo, owner, location } = this;
+		const { github, repo, owner } = this;
 		let issueNumber = 0;
 
 		github.search
@@ -225,14 +216,12 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
 
 	async toggleIssue(title: string) {
-		const { github, repo, owner, location } = this;
+		const { github, repo, owner } = this;
 
 		github.search
 			.issuesAndPullRequests({
@@ -252,8 +241,6 @@ export class GitHubService {
 				});
 			})
 			.catch((e: Error) => {
-				// console.log('Bruh.', e);
-
 				return 'Issue not found.';
 			});
 	}
@@ -304,7 +291,7 @@ export class GitHubService {
 	}
 
 	async createCard(issueContentId: string, title: string) {
-		const { github, project } = this;
+		const { project } = this;
 
 		return await project.items.add(issueContentId, {
 			title: title,
@@ -322,7 +309,7 @@ export class GitHubService {
 	}
 
 	async updateCard(oldTitle: string, newTitle: string) {
-		const { github, project, getCard } = this;
+		const { project, getCard } = this;
 
 		const card: any = await getCard('title');
 

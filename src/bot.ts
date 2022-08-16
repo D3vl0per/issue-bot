@@ -1,11 +1,12 @@
 import 'reflect-metadata';
 
+import { config } from './config.js';
+
 import { Interaction, Message, Partials } from 'discord.js';
 import { dirname, importx } from '@discordx/importer';
 import { IntentsBitField } from 'discord.js';
 import { ActivityType } from 'discord.js';
 import { Client } from 'discordx';
-import { config } from './config.js';
 
 export class Main {
 	public static bot: Client;

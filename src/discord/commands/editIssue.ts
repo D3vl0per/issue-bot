@@ -1,15 +1,12 @@
+import { config } from '../../config.js';
+
 import { CommandInteraction, EmbedBuilder, ModalSubmitInteraction } from 'discord.js';
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
-
 import { Discord, ModalComponent, Slash } from 'discordx';
-// import { getGuildInfo } from '../../utils/dbFunctions.js';
-
-import { GitHubService } from '../../services/githubService.js';
-import { stripStatusFromThread } from '../../utils/discord.js';
 import { Description } from '@discordx/utilities';
-import { config } from '../..//config.js';
 
-const gh = new GitHubService();
+import { stripStatusFromThread } from '../../utils/discord.js';
+import { gh } from '../../services/githubService.js';
 
 @Discord()
 export class EditIssue {

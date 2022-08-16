@@ -1,12 +1,11 @@
-import { Colors, CommandInteraction, EmbedBuilder, ThreadAutoArchiveDuration } from 'discord.js';
+import { config } from '../../config.js';
 
+import { CommandInteraction, EmbedBuilder, ThreadAutoArchiveDuration } from 'discord.js';
+import { Description } from '@discordx/utilities';
 import { Discord, Slash } from 'discordx';
 
-import { gh } from '../../services/githubService.js';
-
 import { labelsWithEmojis } from '../../utils/discord.js';
-import { Description } from '@discordx/utilities';
-import { config } from '../../config.js';
+import { gh } from '../../services/githubService.js';
 
 @Discord()
 export class SyncThread {

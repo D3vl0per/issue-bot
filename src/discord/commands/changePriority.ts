@@ -1,14 +1,11 @@
+import { config } from '../../config.js';
+
 import { CommandInteraction, EmbedBuilder } from 'discord.js';
-
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx';
-// import { getGuildInfo } from '../../utils/dbFunctions.js';
-
-import { GitHubService } from '../../services/githubService.js';
-import { Priorities, stripStatusFromThread } from '../../utils/discord.js';
 import { Description } from '@discordx/utilities';
-import { config } from '../..//config.js';
 
-const gh = new GitHubService();
+import { Priorities, stripStatusFromThread } from '../../utils/discord.js';
+import { gh } from '../../services/githubService.js';
 
 @Discord()
 export class ChangePriority {
@@ -26,11 +23,7 @@ export class ChangePriority {
 		}
 
 		try {
-			const guildId: any = interaction.guildId;
-			// const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-			const { repo, owner, projectId } = gh.getData();
 			gh.init();
-			await gh.populate(guildId, owner, repo, String(projectId));
 
 			// @ts-ignore - Interaction name broken it exists but throws error
 			gh.setPriority(stripStatusFromThread(interaction.channel.name), prio);

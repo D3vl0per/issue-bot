@@ -1,15 +1,12 @@
+import { config } from '../../config.js';
+
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
 import { EmbedBuilder, ThreadAutoArchiveDuration } from 'discord.js';
 
-// import { getGuildInfo, isGuildExists } from '../../utils/dbFunctions.js';
-
 import { stripStatusFromThread } from '../../utils/discord.js';
 import { labelsWithEmojis } from '../../utils/discord.js';
-import { GitHubService, gh } from '../../services/githubService.js';
-import { config } from '../../config.js';
-
-// const gh = new GitHubService();
+import { gh } from '../../services/githubService.js';
 
 @Discord()
 export class ThreadHandler {
@@ -27,19 +24,11 @@ export class ThreadHandler {
 		if (!validChannels?.includes(String(thread.parentId))) return;
 
 		try {
-			// const exists = await isGuildExists(guildId);
-
-			// if (!exists) {
-			// 	thread.send('Missing settings, please set me up.');
-			// 	return;
-			// }
-
-			// const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-			// await gh.populate(guildId, repo_owner, repo_name, project_id);
 			gh.init();
+
 			const { data } = await gh.createIssue(name, name, ['Backlog']);
 			const status = labelsWithEmojis.find((label) => label.label === 'Backlog')?.emoji;
+
 			thread.setName(`${status} - ${name}`);
 
 			issueObj.id = data.number;
@@ -88,28 +77,26 @@ export class ThreadHandler {
 		const oldName = stripStatusFromThread(oldThread.name);
 		const newName = stripStatusFromThread(newThread.name);
 
-		// const { guildId } = newThread;
-		// const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-		// await gh.populate(guildId, repo_owner, repo_name, project_id);
 		gh.init();
+
 		if (newThread.archived) {
 			console.log('THREAD > Archived.');
-			// Lock and close issue
+
 			gh.toggleIssue(oldName);
 			gh.toggleLockIssue(oldName);
+
 			return;
 		}
 
 		if (oldThread.archived && !newThread.archived) {
 			console.log('THREAD > Unarchived.');
-			// Unlock and open issue
+
 			gh.toggleIssue(newName);
 			gh.toggleLockIssue(newName);
+
 			return;
 		}
 
-		// Just simply edit the issue based on name change
 		gh.editIssueWoBody(oldName, newName);
 	}
 	@On('threadDelete')
@@ -118,12 +105,8 @@ export class ThreadHandler {
 
 		console.log('Thread deleted', stripStatusFromThread(name));
 
-		// const { guildId } = thread;
-
-		// const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
-
-		// await gh.populate(guildId, repo_owner, repo_name, project_id);
 		gh.init();
+
 		gh.toggleIssue(name);
 		gh.toggleLockIssue(name);
 	}
