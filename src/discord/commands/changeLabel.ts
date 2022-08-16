@@ -1,12 +1,13 @@
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx';
-import { getGuildInfo } from '../../utils/dbFunctions.js';
+// import { getGuildInfo } from '../../utils/dbFunctions.js';
 
 import { GitHubService, gh } from '../../services/githubService.js';
 
 // const gh = new GitHubService();
-import { Labels, labelsWithEmojis, stripStatusFromThread } from '../../utils/utils.js';
+import { Labels, labelsWithEmojis, stripStatusFromThread } from '../../utils/discord.js';
 import { Description } from '@discordx/utilities';
+import { config } from '../..//config.js';
 
 @Discord()
 export class UpdateLabel {
@@ -21,8 +22,11 @@ export class UpdateLabel {
 		try {
 			const labelCleaned = label.replace('-', ' ');
 
-			await interaction.deferReply({ ephemeral: true });
-			await interaction.followUp(`You selected label: ${label}`);
+			// await interaction.followUp(`You selected label: ${label}`);
+
+			const labelEmbed = new EmbedBuilder()
+				.setColor(config.DC_COLOR as any)
+				.setTitle(`🏷️ Label(s) set to \`${label}\` successfully.`);
 
 			// const guildId: any = interaction.guildId;
 			// const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
@@ -36,6 +40,10 @@ export class UpdateLabel {
 
 			// @ts-ignore
 			// await interaction.channel.setName(`${status} - ${stripStatusFromThread(interaction.channel.name)}`);
+			await interaction.reply({
+				ephemeral: true,
+				embeds: [labelEmbed],
+			});
 		} catch (e: unknown) {
 			interaction.reply({
 				ephemeral: true,

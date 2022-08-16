@@ -2,10 +2,12 @@ import type { ArgsOf, Client } from 'discordx';
 import { Discord, On } from 'discordx';
 import { EmbedBuilder, ThreadAutoArchiveDuration } from 'discord.js';
 
-import { getGuildInfo, isGuildExists } from '../../utils/dbFunctions.js';
+// import { getGuildInfo, isGuildExists } from '../../utils/dbFunctions.js';
 
-import { labelsWithEmojis, stripStatusFromThread } from '../../utils/utils.js';
+import { stripStatusFromThread } from '../../utils/discord.js';
+import { labelsWithEmojis } from '../../utils/discord.js';
 import { GitHubService, gh } from '../../services/githubService.js';
+import { config } from '../../config.js';
 
 // const gh = new GitHubService();
 
@@ -20,7 +22,8 @@ export class ThreadHandler {
 		let issueEmbed: any;
 		let issueObj: any = {};
 
-		const validChannels = process.env.CHANNEL_IDS?.split(',');
+		const validChannels = config.CHANNEL_IDS?.split(',');
+
 		if (!validChannels?.includes(String(thread.parentId))) return;
 
 		try {
@@ -49,7 +52,7 @@ export class ThreadHandler {
 		}
 
 		issueEmbed = new EmbedBuilder()
-			.setColor('#4F53F1')
+			.setColor(config.DC_COLOR as any)
 			.setTitle(name)
 			.setURL(issueObj.issueLink)
 			.setDescription('Issue created.')

@@ -1,13 +1,14 @@
-import type { CommandInteraction } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 
 import { Discord, Slash, SlashOption } from 'discordx';
-import { getGuildInfo } from '../../utils/dbFunctions.js';
+// import { getGuildInfo } from '../../utils/dbFunctions.js';
 
 import { GitHubService, gh } from '../../services/githubService.js';
 
 // const gh = new GitHubService();
-import { stripStatusFromThread } from '../../utils/utils.js';
+import { stripStatusFromThread } from '../../utils/discord.js';
 import { Description } from '@discordx/utilities';
+import { config } from '../../config.js';
 
 @Discord()
 export class AddAssignee {
@@ -34,8 +35,12 @@ export class AddAssignee {
 			await gh.populate(guildId, owner, repo, String(projectId));
 			await gh.addAssignee(channelName, assignee);
 
+			const assigneeEmbed = new EmbedBuilder()
+				.setColor(config.DC_COLOR as any)
+				.setTitle(`🧑 \`${assignee}\` assigned to \`${channelName}\` issue successfully.`);
+
 			await interaction.reply({
-				content: `${assignee} user is assigned to ${channelName} issue.`,
+				embeds: [assigneeEmbed],
 				ephemeral: true,
 			});
 		} catch (error) {

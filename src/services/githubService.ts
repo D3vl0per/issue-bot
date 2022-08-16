@@ -1,5 +1,5 @@
-import { env } from 'process';
-import { capitalize, sleep } from '../utils/utils.js';
+import { config } from '../config.js';
+import { capitalize, sleep } from '../utils/helpers.js';
 
 import { Octokit } from '@octokit/rest';
 import GitHubProject from 'github-project';
@@ -16,17 +16,17 @@ export class GitHubService {
 
 	constructor() {
 		this.github = new Octokit({
-			auth: env.GH_TOKEN,
+			auth: config.GH_TOKEN,
 		});
-		this.guildId = String(env.GUILD_ID);
-		this.repo = String(env.GH_REPO);
-		this.owner = String(env.GH_ORG);
+		this.guildId = config.GUILD_ID;
+		this.repo = config.GH_REPO;
+		this.owner = config.GH_ORG;
 		this.location = `${this.repo}/${this.repo}`;
-		this.projectId = Number(env.GH_PROJECT_NUMBER);
+		this.projectId = config.GH_PROJECT_NUMBER;
 		this.project = new GitHubProject({
-			org: String(env.GH_ORG),
-			number: Number(env.GH_PROJECT_NUMBER),
-			token: String(env.GH_TOKEN),
+			org: config.GH_ORG,
+			number: config.GH_PROJECT_NUMBER,
+			token: config.GH_TOKEN,
 			fields: {
 				priority: 'Priority',
 			},
@@ -34,19 +34,20 @@ export class GitHubService {
 		this.labels = ['Backlog', 'Todo', 'In-Progress', 'Testing', 'Done'];
 	}
 
+	// Reinit to counter weird process handling
 	init() {
 		this.github = new Octokit({
-			auth: env.GH_TOKEN,
+			auth: config.GH_TOKEN,
 		});
-		this.guildId = String(env.GUILD_ID);
-		this.repo = String(env.GH_REPO);
-		this.owner = String(env.GH_ORG);
+		this.guildId = config.GUILD_ID;
+		this.repo = config.GH_REPO;
+		this.owner = config.GH_ORG;
 		this.location = `${this.repo}/${this.repo}`;
-		this.projectId = Number(env.GH_PROJECT_NUMBER);
+		this.projectId = config.GH_PROJECT_NUMBER;
 		this.project = new GitHubProject({
-			org: String(env.GH_ORG),
-			number: Number(env.GH_PROJECT_NUMBER),
-			token: String(env.GH_TOKEN),
+			org: config.GH_ORG,
+			number: config.GH_PROJECT_NUMBER,
+			token: config.GH_TOKEN,
 			fields: {
 				priority: 'Priority',
 			},
@@ -134,7 +135,7 @@ export class GitHubService {
 			.then((query) => {
 				const { number, labels, node_id } = query.data.items[0];
 
-				this.editProject(node_id, capitalize(String(labels[0].name)));
+				// this.editProject(node_id, capitalize(String(labels[0].name)));
 
 				github.issues.update({
 					issue_number: Number(number),
@@ -342,3 +343,4 @@ export class GitHubService {
 }
 
 export const gh = new GitHubService();
+gh.init();

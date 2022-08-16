@@ -1,11 +1,12 @@
-import type { CommandInteraction } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx';
-import { getGuildInfo } from '../../utils/dbFunctions.js';
+// import { getGuildInfo } from '../../utils/dbFunctions.js';
 
 import { GitHubService } from '../../services/githubService.js';
-import { Priorities, stripStatusFromThread } from '../../utils/utils.js';
+import { Priorities, stripStatusFromThread } from '../../utils/discord.js';
 import { Description } from '@discordx/utilities';
+import { config } from '../..//config.js';
 
 const gh = new GitHubService();
 
@@ -34,8 +35,12 @@ export class ChangePriority {
 			// @ts-ignore - Interaction name broken it exists but throws error
 			gh.setPriority(stripStatusFromThread(interaction.channel.name), prio);
 
+			const priorityEmbed = new EmbedBuilder()
+				.setColor(config.DC_COLOR as any)
+				.setTitle(`💈 Priority updated to \`${prio}\` successfully.`);
+
 			await interaction.reply({
-				content: `Priority: ${prio}`,
+				embeds: [priorityEmbed],
 				ephemeral: true,
 			});
 		} catch (error) {

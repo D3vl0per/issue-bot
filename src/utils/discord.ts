@@ -1,9 +1,3 @@
-export function sleep(ms: any) {
-	return new Promise((resolve) => {
-		setTimeout(resolve, ms);
-	});
-}
-
 export function stripStatusFromThread(threadName: string): string {
 	return threadName
 		.split(' ')
@@ -13,10 +7,6 @@ export function stripStatusFromThread(threadName: string): string {
 		.split(' ')
 		.reverse()
 		.join(' ');
-}
-
-export function capitalize(str: string) {
-	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export const labels = [

@@ -1,12 +1,13 @@
-import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, ModalSubmitInteraction } from 'discord.js';
 import { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 import { Discord, ModalComponent, Slash } from 'discordx';
-import { getGuildInfo } from '../../utils/dbFunctions.js';
+// import { getGuildInfo } from '../../utils/dbFunctions.js';
 
 import { GitHubService } from '../../services/githubService.js';
-import { stripStatusFromThread } from '../../utils/utils.js';
+import { stripStatusFromThread } from '../../utils/discord.js';
 import { Description } from '@discordx/utilities';
+import { config } from '../..//config.js';
 
 const gh = new GitHubService();
 
@@ -59,15 +60,19 @@ export class EditIssue {
 		// const guildId: any = interaction.guildId;
 		// const { repo_name, repo_owner, project_id } = await getGuildInfo(guildId);
 
-		interaction.channel.setName(`${status} - ${issueTitle}`);
-
 		// await gh.populate(guildId, repo_owner, repo_name, project_id);
 		await gh.editIssue(stripStatusFromThread(interaction.channel.name), issueTitle, issueBody);
 
+		const issueEmbed = new EmbedBuilder()
+			.setColor(config.DC_COLOR as any)
+			.setTitle(`✨ Issue \`${issueTitle}\` updated successfully.`);
+
 		await interaction.reply({
-			content: `issue title: ${issueTitle}, issue body: ${issueBody}`,
+			embeds: [issueEmbed],
 			ephemeral: true,
 		});
+
+		interaction.channel.setName(`${status} - ${issueTitle}`);
 
 		return;
 	}
