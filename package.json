@@ -27,7 +27,7 @@
 		"discordx": "^10.0.0",
 		"dotenv": "^16.0.1",
 		"gitcord": "^1.0.3",
-		"github-project": "^2.2.0",
+		"github-project": "^3.0.1",
 		"reflect-metadata": "^0.1.13",
 		"util": "^0.12.4"
 	},
