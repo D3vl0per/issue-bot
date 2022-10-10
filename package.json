@@ -23,7 +23,7 @@
 		"@prisma/client": "^4.1.0",
 		"discord-cross-ratelimit": "^0.0.7",
 		"discord-hybrid-sharding": "^1.7.1",
-		"discord.js": "^14.1.2",
+		"discord.js": "^14.6.0",
 		"discordx": "^10.0.0",
 		"dotenv": "^16.0.1",
 		"gitcord": "^1.0.3",
